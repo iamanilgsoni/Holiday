@@ -139,9 +139,9 @@
             </div>
           </div>
 
-          <button id="saveDataBtn" onclick="handleExplicitSave()" class="px-3.5 py-1 text-xs font-bold rounded-lg bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white shadow-xs transition flex items-center gap-1.5" title="Save changes and download standalone updated HTML file">
-            <i class="fa-solid fa-floppy-disk text-emerald-200 text-sm"></i>
-            <span>Save File</span>
+          <button id="saveDataBtn" onclick="handleExplicitSave()" class="px-3.5 py-1 text-xs font-bold rounded-lg bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white shadow-xs transition flex items-center gap-1.5" title="Force Sync and backup HTML">
+            <i class="fa-solid fa-cloud-arrow-up text-emerald-200 text-sm"></i>
+            <span>Force Sync Data</span>
           </button>
         </div>
       </div>
@@ -173,6 +173,9 @@
           <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md font-semibold bg-orange-100 text-orange-900 border border-orange-200 text-[11px]">
             <span class="w-2 h-2 rounded-full bg-orange-500"></span> SH (0.5)
           </span>
+        </div>
+        <div id="syncStatus" class="flex items-center gap-1.5 text-[11px] font-medium text-slate-500">
+          <i class="fa-solid fa-cloud text-slate-400"></i> Loading cloud data...
         </div>
       </div>
     </div>
@@ -449,6 +452,9 @@
   </div>
 
   <script>
+    // --- GOOGLE APPS SCRIPT WEB APP URL ---
+    const GOOGLE_APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyu_ygmy_SsILjOGRUvuBQG1tcim8VkoKjeLWdmUk-i2H_eMNCvnfQ8YaRuY3Iii3lE/exec";
+
     // Configurable Employee Roster (Object with name and Date of Joining)
     const DEFAULT_EMPLOYEES = [
       { name: "Rakesh", doj: "" },
@@ -492,47 +498,91 @@
       }
     }
 
-    function loadStorage() {
-      // 1. Load Employees
-      if (window.__EMBEDDED_EMPLOYEES__ && Array.isArray(window.__EMBEDDED_EMPLOYEES__) && window.__EMBEDDED_EMPLOYEES__.length > 0) {
-        employeeRoster = window.__EMBEDDED_EMPLOYEES__;
-      } else {
-        try {
-          const rawEmps = localStorage.getItem(EMPLOYEES_STORAGE_KEY);
-          if (rawEmps) {
-            employeeRoster = JSON.parse(rawEmps);
-          } else {
-            employeeRoster = JSON.parse(JSON.stringify(DEFAULT_EMPLOYEES));
-          }
-        } catch (e) {
-          employeeRoster = JSON.parse(JSON.stringify(DEFAULT_EMPLOYEES));
-        }
-      }
-
-      employeeRoster = employeeRoster.map(item => {
-        if (typeof item === 'string') return { name: item, doj: '' };
-        return { name: item.name || '', doj: item.doj || '' };
-      }).filter(item => item.name.trim() !== '');
-
-      // 2. Load Attendance Data
-      if (window.__EMBEDDED_ATTENDANCE__ && typeof window.__EMBEDDED_ATTENDANCE__ === 'object' && Object.keys(window.__EMBEDDED_ATTENDANCE__).length > 0) {
-        attendanceData = window.__EMBEDDED_ATTENDANCE__;
-        migrateLegacyAbsentToHoliday();
-        saveStorage();
-        return;
-      }
-
+    // --- REPLACED WITH ASYNC GOOGLE SHEETS LOGIC ---
+    async function loadStorage() {
+      const syncStatus = document.getElementById('syncStatus');
       try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) {
-          attendanceData = JSON.parse(raw);
+        if(syncStatus) syncStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-indigo-500"></i> Loading cloud data...';
+        
+        // Fetch data from Google Sheets Apps Script
+        const response = await fetch(GOOGLE_APP_SCRIPT_URL);
+        const data = await response.json();
+
+        if (data.employees && data.employees.length > 0) {
+          employeeRoster = data.employees;
+          attendanceData = data.attendance || {};
           migrateLegacyAbsentToHoliday();
         } else {
+          // If the sheet is empty, load defaults
+          employeeRoster = JSON.parse(JSON.stringify(DEFAULT_EMPLOYEES));
           attendanceData = {};
         }
+
+        if(syncStatus) syncStatus.innerHTML = '<i class="fa-solid fa-cloud-check text-emerald-500"></i> Cloud Synced';
+        
+        // Refresh UI
+        renderTable();
+        if (!document.getElementById('annualView').classList.contains('hidden')) {
+          renderAnnualOverview();
+        }
+        if (!document.getElementById('employeeModal').classList.contains('hidden')) {
+          renderEmployeeListModal();
+        }
+      } catch (error) {
+        console.error("Failed to load from Google Sheets:", error);
+        if(syncStatus) syncStatus.innerHTML = '<i class="fa-solid fa-cloud-xmark text-rose-500"></i> Offline mode';
+        
+        // Fallback to local storage if offline
+        try {
+          const rawEmps = localStorage.getItem(EMPLOYEES_STORAGE_KEY);
+          if (rawEmps) employeeRoster = JSON.parse(rawEmps);
+          else employeeRoster = JSON.parse(JSON.stringify(DEFAULT_EMPLOYEES));
+          
+          const rawAtt = localStorage.getItem(STORAGE_KEY);
+          if (rawAtt) {
+            attendanceData = JSON.parse(rawAtt);
+            migrateLegacyAbsentToHoliday();
+          }
+          renderTable();
+        } catch (e) {
+          console.error("Local fallback failed.");
+        }
+      }
+    }
+
+    // --- REPLACED WITH ASYNC GOOGLE SHEETS LOGIC ---
+    async function saveStorage() {
+      const syncStatus = document.getElementById('syncStatus');
+      
+      // 1. Save locally as a backup for immediate UI response
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(attendanceData));
+        localStorage.setItem(EMPLOYEES_STORAGE_KEY, JSON.stringify(employeeRoster));
       } catch (e) {
-        console.error("Storage error:", e);
-        attendanceData = {};
+        console.warn("Local storage write failed", e);
+      }
+
+      // 2. Sync to Google Sheets in the background
+      try {
+        if(syncStatus) syncStatus.innerHTML = '<i class="fa-solid fa-arrows-rotate fa-spin text-indigo-500"></i> Syncing...';
+        
+        await fetch(GOOGLE_APP_SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            attendance: attendanceData,
+            employees: employeeRoster
+          }),
+          // no-cors is needed for Apps Script POST requests from static sites to prevent CORS blocking
+          mode: 'no-cors', 
+          headers: {
+            'Content-Type': 'text/plain;charset=utf-8',
+          }
+        });
+        
+        if(syncStatus) syncStatus.innerHTML = '<i class="fa-solid fa-cloud-check text-emerald-500"></i> Cloud Synced';
+      } catch (error) {
+        console.error("Failed to sync to Google Sheets:", error);
+        if(syncStatus) syncStatus.innerHTML = '<i class="fa-solid fa-cloud-xmark text-rose-500"></i> Cloud Sync Failed';
       }
     }
 
@@ -555,23 +605,14 @@
       });
     }
 
-    function saveStorage() {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(attendanceData));
-        localStorage.setItem(EMPLOYEES_STORAGE_KEY, JSON.stringify(employeeRoster));
-      } catch (e) {
-        console.warn("Storage write failed", e);
-      }
-    }
-
     function handleExplicitSave() {
-      saveStorage();
-      downloadUpdatedHTML();
+      saveStorage(); // Trigger cloud sync manually
+      downloadUpdatedHTML(); // Kept for users wanting manual file backups
       
       const saveBtn = document.getElementById('saveDataBtn');
       if (saveBtn) {
         const originalContent = saveBtn.innerHTML;
-        saveBtn.innerHTML = `<i class="fa-solid fa-check text-emerald-200 text-sm"></i><span>Saved!</span>`;
+        saveBtn.innerHTML = `<i class="fa-solid fa-check text-emerald-200 text-sm"></i><span>Synced & Saved!</span>`;
         saveBtn.classList.remove('bg-emerald-600', 'hover:bg-emerald-700');
         saveBtn.classList.add('bg-emerald-800');
         setTimeout(() => {
@@ -583,12 +624,10 @@
       
       const now = new Date();
       const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      showToast(`Attendance saved & HTML backup downloaded successfully at ${timeStr}!`);
+      showToast(`Data synced to cloud & HTML backup downloaded at ${timeStr}!`);
     }
 
     function downloadUpdatedHTML() {
-      saveStorage();
-
       let fullHtml = document.documentElement.outerHTML;
       const embeddedScript = `<script id="embedded-data">\n    window.__EMBEDDED_ATTENDANCE__ = ${JSON.stringify(attendanceData, null, 2)};\n    window.__EMBEDDED_EMPLOYEES__ = ${JSON.stringify(employeeRoster, null, 2)};\n  <\/script>`;
 
@@ -749,7 +788,7 @@
       }
 
       employeeRoster.push({ name, doj });
-      saveStorage();
+      saveStorage(); // Will sync to cloud automatically
       renderEmployeeListModal();
       renderTable();
       renderAnnualOverview();
@@ -784,7 +823,7 @@
       });
 
       employeeRoster[index].name = newName;
-      saveStorage();
+      saveStorage(); // Will sync to cloud automatically
       renderTable();
       renderAnnualOverview();
       showToast(`Renamed ${oldName} to ${newName}.`);
@@ -792,7 +831,7 @@
 
     function updateEmployeeDoj(index, newDoj) {
       employeeRoster[index].doj = newDoj;
-      saveStorage();
+      saveStorage(); // Will sync to cloud automatically
       renderAnnualOverview();
       showToast(`Updated DOJ to ${formatToDDMMYYYY(newDoj)} for ${employeeRoster[index].name}.`);
     }
@@ -804,7 +843,7 @@
       }
 
       employeeRoster.splice(index, 1);
-      saveStorage();
+      saveStorage(); // Will sync to cloud automatically
       renderEmployeeListModal();
       renderTable();
       renderAnnualOverview();
@@ -1382,7 +1421,7 @@
         }
       });
 
-      saveStorage();
+      saveStorage(); // Syncs to cloud automatically
       renderTable();
       closeDayColumnModal();
 
@@ -1426,7 +1465,7 @@
         attendanceData[monthKey][emp][day] = status;
       }
 
-      saveStorage();
+      saveStorage(); // Syncs to cloud automatically
       renderTable();
       closeModal();
       showToast(`${emp} Day ${day} updated to ${status === 'EMPTY' ? 'Cleared' : (STATUS_MAP[status]?.name || status)}`);
@@ -1441,7 +1480,7 @@
       const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
       const key = getMonthKey(year, month);
       delete attendanceData[key];
-      saveStorage();
+      saveStorage(); // Syncs to cloud automatically
       renderTable();
       showToast(`Reset ${monthNames[month]} ${year} to default values.`);
     }
@@ -1673,7 +1712,7 @@
         return;
       }
 
-      saveStorage();
+      saveStorage(); // Syncs to cloud automatically
       renderTable();
       closeImportModal();
       showToast(`Import completed! ${updatedCount} entries updated (${skippedCount} skipped).`);
@@ -1701,7 +1740,7 @@
     window.addEventListener('resize', updateStickyMeasurements);
 
     document.addEventListener('DOMContentLoaded', () => {
-      loadStorage();
+      loadStorage(); // Fetches from Google Sheets on page load
       updateStickyMeasurements();
 
       const mainCycleSelect = document.getElementById('mainCycleSelect');
