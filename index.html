@@ -4,27 +4,68 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SKRUPAM ENTERPRISES - Employee Attendance Sheet</title>
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons CDN -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- jsPDF & AutoTable for Pure Vector PDF Output -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
   
+  <!-- EMBEDDED ATTENDANCE & EMPLOYEE DATA CONTAINER -->
   <script id="embedded-data">
     window.__EMBEDDED_ATTENDANCE__ = null;
     window.__EMBEDDED_EMPLOYEES__ = null;
   </script>
 
   <style>
-    :root { --top-sticky-height: 92px; }
-    html { scroll-behavior: smooth; scroll-snap-type: y mandatory; scroll-padding-top: var(--top-sticky-height); }
-    .snap-month-card { scroll-snap-align: start; scroll-snap-stop: always; scroll-margin-top: var(--top-sticky-height); }
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #f8fafc; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
-    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-    .sticky-col-emp { position: sticky; left: 0; z-index: 20; }
-    .sticky-corner-emp { position: sticky; left: 0; top: 0; z-index: 30; }
-    .sticky-header { position: sticky; top: 0; z-index: 25; }
+    :root {
+      --top-sticky-height: 92px;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-snap-type: y mandatory;
+      scroll-padding-top: var(--top-sticky-height);
+    }
+
+    .snap-month-card {
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      scroll-margin-top: var(--top-sticky-height);
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f8fafc;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    .sticky-col-emp {
+      position: sticky;
+      left: 0;
+      z-index: 20;
+    }
+    .sticky-corner-emp {
+      position: sticky;
+      left: 0;
+      top: 0;
+      z-index: 30;
+    }
+    .sticky-header {
+      position: sticky;
+      top: 0;
+      z-index: 25;
+    }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col font-sans">
@@ -44,6 +85,7 @@
         </div>
 
         <div class="flex flex-wrap items-center gap-2">
+          <!-- Cycle Range Selector (June to May) -->
           <div class="inline-flex items-center rounded-lg border border-indigo-200 bg-indigo-50/50 px-2.5 py-1 shadow-2xs gap-1.5">
             <span class="text-xs font-semibold text-indigo-900"><i class="fa-solid fa-calendar-days text-indigo-600 mr-1"></i>Cycle:</span>
             <select id="mainCycleSelect" class="bg-transparent text-xs font-bold text-indigo-700 focus:outline-none cursor-pointer">
@@ -64,7 +106,8 @@
             <i class="fa-solid fa-calendar-day text-indigo-600"></i> Go to Current Month
           </button>
 
-          <button onclick="openEmployeeModal()" class="px-3 py-1 text-xs font-semibold rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 transition flex items-center gap-1.5 shadow-2xs">
+          <!-- Manage Employees Button -->
+          <button onclick="openEmployeeModal()" class="px-3 py-1 text-xs font-semibold rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 transition flex items-center gap-1.5 shadow-2xs" title="Add or edit employees and DOJ">
             <i class="fa-solid fa-user-gear text-indigo-600"></i> Manage Employees
           </button>
 
@@ -72,7 +115,7 @@
             <i class="fa-solid fa-chart-pie mr-1 text-slate-500"></i> Annual Overview
           </button>
 
-          <button id="openImportModalBtn" class="px-3 py-1 text-xs font-semibold rounded-lg border border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition shadow-2xs flex items-center gap-1.5">
+          <button id="openImportModalBtn" class="px-3 py-1 text-xs font-semibold rounded-lg border border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition shadow-2xs flex items-center gap-1.5" title="Import Attendance CSV">
             <i class="fa-solid fa-file-import text-indigo-600"></i> Import CSV
           </button>
 
@@ -80,6 +123,7 @@
             <button id="exportMenuBtn" class="px-3 py-1 text-xs font-semibold rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 transition shadow-2xs flex items-center gap-1.5">
               <i class="fa-solid fa-file-csv text-emerald-600"></i> Export CSV <i class="fa-solid fa-caret-down text-[10px]"></i>
             </button>
+            
             <div id="exportMenu" class="hidden absolute right-0 mt-1 w-56 bg-white border border-slate-200 rounded-xl shadow-xl z-50 p-2 text-xs space-y-1">
               <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-2 py-1">Export Options</div>
               <button onclick="exportStructuredCSV('year')" class="w-full text-left px-2 py-1.5 rounded-lg hover:bg-slate-100 font-medium text-slate-700 flex items-center gap-2">
@@ -91,7 +135,7 @@
             </div>
           </div>
 
-          <button id="saveDataBtn" onclick="handleSync()" class="px-3.5 py-1 text-xs font-bold rounded-lg bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white shadow-xs transition flex items-center gap-1.5">
+          <button id="saveDataBtn" onclick="handleSync()" class="px-3.5 py-1 text-xs font-bold rounded-lg bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white shadow-xs transition flex items-center gap-1.5" title="Sync data to Google Sheets">
             <i class="fa-solid fa-cloud-arrow-up text-emerald-200 text-sm"></i>
             <span>Sync</span>
           </button>
@@ -99,12 +143,13 @@
       </div>
     </header>
 
+    <!-- Pinned Statuses Legend Bar -->
     <div id="stickyLegendBar" class="bg-slate-50/95 px-4 sm:px-6 py-1.5 backdrop-blur-xs">
       <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 text-xs">
         <div class="flex flex-wrap items-center gap-1.5">
           <span class="font-bold text-slate-500 uppercase tracking-wider text-[10px] mr-1">STATUSES:</span>
           <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md font-semibold bg-sky-100 text-sky-800 border border-sky-300 text-[11px]">
-            <span class="w-2 h-2 rounded-full bg-sky-500"></span> WO <span class="text-[10px] text-sky-600 font-normal">[Sat/Sun]</span>
+            <span class="w-2 h-2 rounded-full bg-sky-500"></span> WO <span class="text-[10px] text-sky-600 font-normal">[Sat/Sun Auto]</span>
           </span>
           <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md font-semibold bg-purple-100 text-purple-800 border border-purple-200 text-[11px]">
             <span class="w-2 h-2 rounded-full bg-purple-600"></span> BH
@@ -125,25 +170,33 @@
             <span class="w-2 h-2 rounded-full bg-orange-500"></span> SH (0.5)
           </span>
         </div>
+        
         <div id="syncStatus" class="flex items-center gap-1.5 text-[11px] font-medium text-slate-500">
           <i class="fa-solid fa-cloud text-slate-400"></i> Loading cloud data...
         </div>
+        
       </div>
     </div>
   </div>
 
+  <!-- Main Body Content -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 pt-3 pb-24 flex flex-col gap-6">
+    
     <div id="monthlyView" class="w-full space-y-8">
       <div id="allMonthsContainer" class="space-y-8 w-full"></div>
     </div>
 
+    <!-- Annual Overview View with Date of Joining (DOJ) -->
     <div id="annualView" class="hidden space-y-4">
       <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-md">
         <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
           <div>
             <div class="flex items-center gap-2">
-              <h2 class="text-base font-bold text-slate-900">Annual Leaves &amp; Holidays Summary:</h2>
-              <select id="annualCycleSelect" class="bg-indigo-50 border border-indigo-200 text-indigo-900 font-bold text-xs rounded-lg px-2.5 py-1 focus:ring-2 focus:ring-indigo-500 focus:outline-none cursor-pointer"></select>
+              <h2 class="text-base font-bold text-slate-900">
+                Annual Leaves &amp; Holidays Summary:
+              </h2>
+              <select id="annualCycleSelect" class="bg-indigo-50 border border-indigo-200 text-indigo-900 font-bold text-xs rounded-lg px-2.5 py-1 focus:ring-2 focus:ring-indigo-500 focus:outline-none cursor-pointer">
+              </select>
             </div>
             <p class="text-xs text-slate-500 mt-1">Company Annual Cycle: <b>1st June to 31st May</b> &bull; Total Leaves strictly excludes Week Offs &amp; Bank Holidays</p>
           </div>
@@ -157,51 +210,73 @@
             <thead>
               <tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
                 <th class="py-3 px-4">Employee</th>
-                <th class="py-3 px-3 text-center text-indigo-700 font-bold bg-indigo-50/70">Date of Joining</th>
-                <th class="py-3 px-3 text-center text-sky-700 font-bold bg-sky-50/70">Week Offs (WO)</th>
-                <th class="py-3 px-3 text-center text-purple-700 font-bold bg-purple-50/70">Bank Holidays (BH)</th>
+                <th class="py-3 px-3 text-center text-indigo-700 font-bold bg-indigo-50/70">Date of Joining (DOJ)</th>
+                <th class="py-3 px-3 text-center text-sky-700 font-bold bg-sky-50/70" title="Informational only">Week Offs (WO)</th>
+                <th class="py-3 px-3 text-center text-purple-700 font-bold bg-purple-50/70" title="Informational only">Bank Holidays (BH)</th>
                 <th class="py-3 px-3 text-center text-rose-600 font-semibold">Holiday (H)</th>
                 <th class="py-3 px-3 text-center text-red-600 font-semibold">LWP</th>
                 <th class="py-3 px-3 text-center text-amber-600 font-semibold">Half Days (FH+SH)</th>
-                <th class="py-3 px-3 text-center font-extrabold text-rose-950 bg-rose-100">Total Holidays / Leaves</th>
+                <th class="py-3 px-3 text-center font-extrabold text-rose-950 bg-rose-100" title="Holiday + LWP + (Half * 0.5)">Total Holidays / Leaves</th>
               </tr>
             </thead>
-            <tbody id="annualSummaryBody" class="divide-y divide-slate-200"></tbody>
+            <tbody id="annualSummaryBody" class="divide-y divide-slate-200">
+            </tbody>
           </table>
         </div>
       </div>
     </div>
+
   </main>
 
+  <!-- Employee Management Modal (Add, Edit, DOJ) -->
   <div id="employeeModal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-2xs z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-lg w-full p-6 space-y-4">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
         <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-sm"><i class="fa-solid fa-users-gear"></i></div>
-          <div><h3 class="font-bold text-sm text-slate-900">Manage Employee Roster</h3></div>
+          <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-sm">
+            <i class="fa-solid fa-users-gear"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-sm text-slate-900">Manage Employee Roster</h3>
+            <p class="text-xs text-slate-500">Add new staff, edit names, or update Date of Joining (DOJ)</p>
+          </div>
         </div>
-        <button onclick="closeEmployeeModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg"><i class="fa-solid fa-xmark text-base"></i></button>
+        <button onclick="closeEmployeeModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+          <i class="fa-solid fa-xmark text-base"></i>
+        </button>
       </div>
+
+      <!-- Add New Employee Form -->
       <div class="bg-indigo-50/50 border border-indigo-100 rounded-xl p-3.5 space-y-2">
         <span class="text-xs font-bold text-indigo-900"><i class="fa-solid fa-user-plus mr-1 text-indigo-600"></i> Add New Employee</span>
         <div class="grid grid-cols-1 sm:grid-cols-7 gap-2">
           <input type="text" id="newEmpName" placeholder="Employee Name" class="sm:col-span-4 bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500">
           <input type="date" id="newEmpDoj" class="sm:col-span-3 bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" title="Date of Joining">
         </div>
-        <button onclick="addNewEmployee()" class="w-full mt-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-1.5 rounded-lg text-xs transition flex items-center justify-center gap-1.5"><i class="fa-solid fa-plus"></i> Add to Staff Roster</button>
+        <button onclick="addNewEmployee()" class="w-full mt-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-1.5 rounded-lg text-xs transition flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-plus"></i> Add to Staff Roster
+        </button>
       </div>
+
+      <!-- Current Employee List with Inline Editing -->
       <div class="space-y-2">
         <div class="flex items-center justify-between text-xs font-bold text-slate-700">
           <span>Current Employees (<span id="empCountDisplay">0</span>)</span>
+          <span class="text-[11px] text-slate-400 font-normal">Editing updates attendance records dynamically</span>
         </div>
-        <div id="employeeListContainer" class="max-h-60 overflow-y-auto space-y-2 pr-1"></div>
+        <div id="employeeListContainer" class="max-h-60 overflow-y-auto space-y-2 pr-1">
+        </div>
       </div>
+
       <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
-        <button onclick="closeEmployeeModal()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-semibold transition">Close</button>
+        <button onclick="closeEmployeeModal()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-semibold transition">
+          Close
+        </button>
       </div>
     </div>
   </div>
 
+  <!-- Day Column Modal -->
   <div id="dayColumnModal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-2xs z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-sm w-full p-5 space-y-4">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -212,24 +287,49 @@
           </div>
           <p id="modalDayColumnSubtitle" class="text-xs text-slate-500 mt-0.5">Select a status to apply across all staff</p>
         </div>
-        <button onclick="closeDayColumnModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg"><i class="fa-solid fa-xmark text-base"></i></button>
+        <button onclick="closeDayColumnModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+          <i class="fa-solid fa-xmark text-base"></i>
+        </button>
       </div>
+
+      <p class="text-[11px] text-slate-500">Choose attendance status for everyone on this day:</p>
+
       <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
-        <button onclick="setDayColumnStatus('P')" class="col-span-2 flex items-center justify-center gap-2 p-2.5 rounded-lg border border-emerald-300 bg-emerald-500 hover:bg-emerald-600 text-white shadow-xs transition"><span class="w-3 h-3 rounded-full bg-white"></span> Mark All as Present (P)</button>
-        <button onclick="setDayColumnStatus('BH')" class="col-span-2 flex items-center justify-center gap-2 p-2.5 rounded-lg border border-purple-200 bg-purple-600 hover:bg-purple-700 text-white shadow-xs transition"><span class="w-3 h-3 rounded-full bg-white"></span> Bank Holiday (BH)</button>
-        <button onclick="setDayColumnStatus('WO')" class="flex items-center gap-2 p-2.5 rounded-lg border border-sky-300 bg-sky-50 text-sky-800 hover:bg-sky-100 transition"><span class="w-3 h-3 rounded-full bg-sky-500"></span> Week Off (WO)</button>
-        <button onclick="setDayColumnStatus('H')" class="flex items-center gap-2 p-2.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-800 hover:bg-rose-100 transition"><span class="w-3 h-3 rounded-full bg-rose-500"></span> Holiday (H)</button>
-        <button onclick="setDayColumnStatus('LWP')" class="flex items-center gap-2 p-2.5 rounded-lg border border-red-200 bg-red-50 text-red-800 hover:bg-red-100 transition"><span class="w-3 h-3 rounded-full bg-red-600"></span> LWP</button>
-        <button onclick="setDayColumnStatus('FH')" class="flex items-center gap-2 p-2.5 rounded-lg border border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100 transition"><span class="w-3 h-3 rounded-full bg-amber-500"></span> 1st Half (FH)</button>
-        <button onclick="setDayColumnStatus('SH')" class="col-span-2 flex items-center justify-center gap-2 p-2 rounded-lg border border-orange-200 bg-orange-50 text-orange-800 hover:bg-orange-100 transition"><span class="w-3 h-3 rounded-full bg-orange-500"></span> 2nd Half (SH)</button>
+        <button onclick="setDayColumnStatus('P')" class="col-span-2 flex items-center justify-center gap-2 p-2.5 rounded-lg border border-emerald-300 bg-emerald-500 hover:bg-emerald-600 text-white shadow-xs transition">
+          <span class="w-3 h-3 rounded-full bg-white"></span> Mark All as Present (P)
+        </button>
+        <button onclick="setDayColumnStatus('BH')" class="col-span-2 flex items-center justify-center gap-2 p-2.5 rounded-lg border border-purple-200 bg-purple-600 hover:bg-purple-700 text-white shadow-xs transition">
+          <span class="w-3 h-3 rounded-full bg-white"></span> Bank Holiday (BH) - All Staff
+        </button>
+        <button onclick="setDayColumnStatus('WO')" class="flex items-center gap-2 p-2.5 rounded-lg border border-sky-300 bg-sky-50 text-sky-800 hover:bg-sky-100 transition">
+          <span class="w-3 h-3 rounded-full bg-sky-500"></span> Week Off (WO)
+        </button>
+        <button onclick="setDayColumnStatus('H')" class="flex items-center gap-2 p-2.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-800 hover:bg-rose-100 transition">
+          <span class="w-3 h-3 rounded-full bg-rose-500"></span> Holiday (H)
+        </button>
+        <button onclick="setDayColumnStatus('LWP')" class="flex items-center gap-2 p-2.5 rounded-lg border border-red-200 bg-red-50 text-red-800 hover:bg-red-100 transition">
+          <span class="w-3 h-3 rounded-full bg-red-600"></span> LWP
+        </button>
+        <button onclick="setDayColumnStatus('FH')" class="flex items-center gap-2 p-2.5 rounded-lg border border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100 transition">
+          <span class="w-3 h-3 rounded-full bg-amber-500"></span> 1st Half (FH)
+        </button>
+        <button onclick="setDayColumnStatus('SH')" class="col-span-2 flex items-center justify-center gap-2 p-2 rounded-lg border border-orange-200 bg-orange-50 text-orange-800 hover:bg-orange-100 transition">
+          <span class="w-3 h-3 rounded-full bg-orange-500"></span> 2nd Half (SH)
+        </button>
       </div>
+
       <div class="flex items-center justify-between pt-2 border-t border-slate-100">
-        <button onclick="setDayColumnStatus('EMPTY')" class="text-xs text-rose-600 hover:text-rose-800 font-semibold flex items-center gap-1"><i class="fa-regular fa-trash-can"></i> Reset to Default</button>
-        <button onclick="closeDayColumnModal()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg font-medium transition">Cancel</button>
+        <button onclick="setDayColumnStatus('EMPTY')" class="text-xs text-rose-600 hover:text-rose-800 font-semibold flex items-center gap-1">
+          <i class="fa-regular fa-trash-can"></i> Reset to Default
+        </button>
+        <button onclick="closeDayColumnModal()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg font-medium transition">
+          Cancel
+        </button>
       </div>
     </div>
   </div>
 
+  <!-- Single Cell Modal -->
   <div id="statusModal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-2xs z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-sm w-full p-5 space-y-4">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -237,48 +337,113 @@
           <h3 id="modalEmpName" class="font-bold text-sm text-slate-900">Employee Name</h3>
           <p id="modalDateInfo" class="text-xs text-slate-500">Date Info</p>
         </div>
-        <button id="closeModalBtn" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg"><i class="fa-solid fa-xmark text-base"></i></button>
+        <button id="closeModalBtn" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+          <i class="fa-solid fa-xmark text-base"></i>
+        </button>
       </div>
+
+      <p class="text-[11px] text-slate-500">Change individual employee status:</p>
+
       <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
-        <button onclick="setCellStatus('P')" class="col-span-2 flex items-center justify-center gap-2 p-2.5 rounded-lg border border-emerald-300 bg-emerald-500 hover:bg-emerald-600 text-white shadow-xs transition"><span class="w-3 h-3 rounded-full bg-white"></span> Mark as Present (P)</button>
-        <button onclick="setCellStatus('WO')" class="flex items-center gap-2 p-2.5 rounded-lg border border-sky-300 bg-sky-50 text-sky-800 hover:bg-sky-100 transition"><span class="w-3 h-3 rounded-full bg-sky-500"></span> Week Off (WO)</button>
-        <button onclick="setCellStatus('BH')" class="flex items-center gap-2 p-2.5 rounded-lg border border-purple-200 bg-purple-50 text-purple-800 hover:bg-purple-100 transition"><span class="w-3 h-3 rounded-full bg-purple-600"></span> Bank Holiday (BH)</button>
-        <button onclick="setCellStatus('H')" class="flex items-center gap-2 p-2.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-800 hover:bg-rose-100 transition"><span class="w-3 h-3 rounded-full bg-rose-500"></span> Holiday (H)</button>
-        <button onclick="setCellStatus('LWP')" class="flex items-center gap-2 p-2.5 rounded-lg border border-red-200 bg-red-50 text-red-800 hover:bg-red-100 transition"><span class="w-3 h-3 rounded-full bg-red-600"></span> LWP</button>
-        <button onclick="setCellStatus('FH')" class="flex items-center gap-2 p-2.5 rounded-lg border border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100 transition"><span class="w-3 h-3 rounded-full bg-amber-500"></span> 1st Half (FH)</button>
-        <button onclick="setCellStatus('SH')" class="flex items-center gap-2 p-2.5 rounded-lg border border-orange-200 bg-orange-50 text-orange-800 hover:bg-orange-100 transition"><span class="w-3 h-3 rounded-full bg-orange-500"></span> 2nd Half (SH)</button>
+        <button onclick="setCellStatus('P')" class="col-span-2 flex items-center justify-center gap-2 p-2.5 rounded-lg border border-emerald-300 bg-emerald-500 hover:bg-emerald-600 text-white shadow-xs transition">
+          <span class="w-3 h-3 rounded-full bg-white"></span> Mark as Present (P)
+        </button>
+        <button onclick="setCellStatus('WO')" class="flex items-center gap-2 p-2.5 rounded-lg border border-sky-300 bg-sky-50 text-sky-800 hover:bg-sky-100 transition">
+          <span class="w-3 h-3 rounded-full bg-sky-500"></span> Week Off (WO)
+        </button>
+        <button onclick="setCellStatus('BH')" class="flex items-center gap-2 p-2.5 rounded-lg border border-purple-200 bg-purple-50 text-purple-800 hover:bg-purple-100 transition">
+          <span class="w-3 h-3 rounded-full bg-purple-600"></span> Bank Holiday (BH)
+        </button>
+        <button onclick="setCellStatus('H')" class="flex items-center gap-2 p-2.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-800 hover:bg-rose-100 transition">
+          <span class="w-3 h-3 rounded-full bg-rose-500"></span> Holiday (H)
+        </button>
+        <button onclick="setCellStatus('LWP')" class="flex items-center gap-2 p-2.5 rounded-lg border border-red-200 bg-red-50 text-red-800 hover:bg-red-100 transition">
+          <span class="w-3 h-3 rounded-full bg-red-600"></span> Leave Without Pay (LWP)
+        </button>
+        <button onclick="setCellStatus('FH')" class="flex items-center gap-2 p-2.5 rounded-lg border border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100 transition">
+          <span class="w-3 h-3 rounded-full bg-amber-500"></span> 1st Half (FH)
+        </button>
+        <button onclick="setCellStatus('SH')" class="flex items-center gap-2 p-2.5 rounded-lg border border-orange-200 bg-orange-50 text-orange-800 hover:bg-orange-100 transition">
+          <span class="w-3 h-3 rounded-full bg-orange-500"></span> 2nd Half (SH)
+        </button>
       </div>
+
       <div class="flex items-center justify-between pt-2 border-t border-slate-100">
-        <button onclick="setCellStatus('EMPTY')" class="text-xs text-rose-600 hover:text-rose-800 font-semibold flex items-center gap-1"><i class="fa-regular fa-trash-can"></i> Clear Day (Empty)</button>
-        <button onclick="closeModal()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg font-medium transition">Cancel</button>
+        <button onclick="setCellStatus('EMPTY')" class="text-xs text-rose-600 hover:text-rose-800 font-semibold flex items-center gap-1">
+          <i class="fa-regular fa-trash-can"></i> Clear Day (Empty)
+        </button>
+        <button onclick="closeModal()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg font-medium transition">
+          Cancel
+        </button>
       </div>
     </div>
   </div>
 
+  <!-- CSV Import Modal Dialog -->
   <div id="importModal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-2xs z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-lg w-full p-6 space-y-4">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
         <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-sm"><i class="fa-solid fa-file-import"></i></div>
-          <div><h3 class="font-bold text-sm text-slate-900">Import Attendance CSV</h3></div>
+          <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-sm">
+            <i class="fa-solid fa-file-import"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-sm text-slate-900">Import Attendance CSV</h3>
+            <p class="text-xs text-slate-500">Update or populate calendar records from file</p>
+          </div>
         </div>
-        <button id="closeImportModalBtn" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg"><i class="fa-solid fa-xmark text-base"></i></button>
+        <button id="closeImportModalBtn" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+          <i class="fa-solid fa-xmark text-base"></i>
+        </button>
       </div>
+
+      <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs text-slate-600 space-y-2">
+        <div class="font-bold text-slate-700 flex items-center gap-1">
+          <i class="fa-solid fa-circle-info text-indigo-500"></i> Supported Formats:
+        </div>
+        <ul class="list-disc list-inside space-y-1 text-[11px] text-slate-600">
+          <li><b>Standard Detailed CSV:</b> <code class="bg-slate-200 px-1 py-0.5 rounded text-indigo-700">Employee, Date (YYYY-MM-DD), Status</code></li>
+          <li><b>Split Columns CSV:</b> <code class="bg-slate-200 px-1 py-0.5 rounded text-indigo-700">Employee, Year, Month, Day, Status</code></li>
+          <li><b>Monthly Grid CSV:</b> Exported directly from this sheet with Day 1...Day 31 headers.</li>
+          <li>Valid statuses: <span class="font-bold">P, WO, BH, H (or A), FH, SH, LWP</span> (or empty to clear).</li>
+        </ul>
+        <div class="pt-1 flex items-center justify-between">
+          <span class="text-[11px] text-slate-500">Need a starting structure?</span>
+          <button onclick="downloadSampleCSV()" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
+            <i class="fa-solid fa-download"></i> Download Sample CSV Template
+          </button>
+        </div>
+      </div>
+
       <div class="space-y-3">
         <label class="block text-xs font-bold text-slate-700">Select CSV File:</label>
         <div class="border-2 border-dashed border-slate-300 hover:border-indigo-400 bg-slate-50/50 hover:bg-indigo-50/20 rounded-xl p-5 text-center transition cursor-pointer" onclick="document.getElementById('csvFileInput').click()">
           <input type="file" id="csvFileInput" accept=".csv,text/csv" class="hidden">
           <div class="text-indigo-600 text-3xl mb-1"><i class="fa-solid fa-cloud-arrow-up"></i></div>
           <div class="text-xs font-semibold text-slate-700" id="selectedFileName">Click to choose or drag &amp; drop CSV file</div>
+          <div class="text-[10px] text-slate-400 mt-1">.csv format only &bull; max 5MB</div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <input type="checkbox" id="overwriteOption" class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer">
+          <label for="overwriteOption" class="text-xs text-slate-600 cursor-pointer">
+            Cleanly overwrite existing values for imported dates (checked) or merge alongside existing.
+          </label>
         </div>
       </div>
+
       <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
-        <button onclick="closeImportModal()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-lg font-medium transition">Cancel</button>
-        <button id="processImportBtn" class="text-xs bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-lg shadow-sm transition flex items-center gap-1.5">Parse &amp; Apply</button>
+        <button onclick="closeImportModal()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-lg font-medium transition">
+          Cancel
+        </button>
+        <button id="processImportBtn" class="text-xs bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-lg shadow-sm transition flex items-center gap-1.5">
+          <i class="fa-solid fa-file-arrow-up"></i> Parse &amp; Apply to Calendar
+        </button>
       </div>
     </div>
   </div>
 
+  <!-- Notification Toast -->
   <div id="toast" class="fixed bottom-4 right-4 bg-slate-900 text-white text-xs px-4 py-2.5 rounded-xl shadow-xl transition-all duration-300 opacity-0 pointer-events-none transform translate-y-3 z-50 flex items-center gap-2">
     <i class="fa-solid fa-circle-check text-emerald-400"></i>
     <span id="toastMsg">Changes saved</span>
@@ -288,12 +453,18 @@
     // --- GOOGLE APPS SCRIPT WEB APP URL ---
     const GOOGLE_APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyu_ygmy_SsILjOGRUvuBQG1tcim8VkoKjeLWdmUk-i2H_eMNCvnfQ8YaRuY3Iii3lE/exec";
 
+    // Configurable Employee Roster (Object with name and Date of Joining)
     const DEFAULT_EMPLOYEES = [
-      { name: "Rakesh", doj: "" }, { name: "Kuldeep", doj: "" }, { name: "Anil", doj: "" },
-      { name: "Karan", doj: "" }, { name: "Jagdish", doj: "" }, { name: "Vinay", doj: "" }
+      { name: "Rakesh", doj: "" },
+      { name: "Kuldeep", doj: "" },
+      { name: "Anil", doj: "" },
+      { name: "Karan", doj: "" },
+      { name: "Jagdish", doj: "" },
+      { name: "Vinay", doj: "" }
     ];
 
     let employeeRoster = [];
+
     const STATUS_MAP = {
       'WO':  { label: 'WO',  name: 'Week Off',            bg: 'bg-sky-100 text-sky-800 font-bold border border-sky-300' },
       'P':   { label: 'P',   name: 'Present',             bg: 'bg-emerald-500 text-white font-bold shadow-2xs' },
@@ -307,6 +478,7 @@
     const realToday = new Date();
     const realTodayYear = realToday.getFullYear();
     const realTodayMonth = realToday.getMonth();
+    const realTodayDate = realToday.getDate();
 
     let selectedCycleStartYear = 2026;
     let activeCellTarget = null;
@@ -318,7 +490,10 @@
 
     function updateStickyMeasurements() {
       const topBar = document.getElementById('topStickyHeader');
-      if (topBar) document.documentElement.style.setProperty('--top-sticky-height', `${topBar.offsetHeight}px`);
+      if (topBar) {
+        const height = topBar.offsetHeight;
+        document.documentElement.style.setProperty('--top-sticky-height', `${height}px`);
+      }
     }
 
     async function loadStorage() {
@@ -339,21 +514,52 @@
         }
 
         if(syncStatus) syncStatus.innerHTML = '<i class="fa-solid fa-cloud-check text-emerald-500"></i> Cloud Synced';
+        
         renderTable();
-        if (!document.getElementById('annualView').classList.contains('hidden')) renderAnnualOverview();
+        if (!document.getElementById('annualView').classList.contains('hidden')) {
+          renderAnnualOverview();
+        }
+        if (!document.getElementById('employeeModal').classList.contains('hidden')) {
+          renderEmployeeListModal();
+        }
       } catch (error) {
         console.error("Failed to load from Google Sheets:", error);
         if(syncStatus) syncStatus.innerHTML = '<i class="fa-solid fa-cloud-xmark text-rose-500"></i> Offline mode';
         
-        const rawEmps = localStorage.getItem(EMPLOYEES_STORAGE_KEY);
-        employeeRoster = rawEmps ? JSON.parse(rawEmps) : JSON.parse(JSON.stringify(DEFAULT_EMPLOYEES));
-        const rawAtt = localStorage.getItem(STORAGE_KEY);
-        if (rawAtt) {
-          attendanceData = JSON.parse(rawAtt);
-          migrateLegacyAbsentToHoliday();
+        try {
+          const rawEmps = localStorage.getItem(EMPLOYEES_STORAGE_KEY);
+          if (rawEmps) employeeRoster = JSON.parse(rawEmps);
+          else employeeRoster = JSON.parse(JSON.stringify(DEFAULT_EMPLOYEES));
+          
+          const rawAtt = localStorage.getItem(STORAGE_KEY);
+          if (rawAtt) {
+            attendanceData = JSON.parse(rawAtt);
+            migrateLegacyAbsentToHoliday();
+          }
+          renderTable();
+        } catch (e) {
+          console.error("Local fallback failed.");
         }
-        renderTable();
       }
+    }
+
+    function migrateLegacyAbsentToHoliday() {
+      if (!attendanceData || typeof attendanceData !== 'object') return;
+      Object.keys(attendanceData).forEach(mKey => {
+        const monthObj = attendanceData[mKey];
+        if (monthObj && typeof monthObj === 'object') {
+          Object.keys(monthObj).forEach(emp => {
+            const empObj = monthObj[emp];
+            if (empObj && typeof empObj === 'object') {
+              Object.keys(empObj).forEach(d => {
+                if (empObj[d] === 'A') {
+                  empObj[d] = 'H';
+                }
+              });
+            }
+          });
+        }
+      });
     }
 
     async function saveStorage() {
@@ -371,7 +577,11 @@
         
         await fetch(GOOGLE_APP_SCRIPT_URL, {
           method: 'POST',
-          body: JSON.stringify({ attendance: attendanceData, employees: employeeRoster }),
+          body: JSON.stringify({
+            attendance: attendanceData,
+            employees: employeeRoster
+          }),
+          redirect: 'follow', 
           headers: {
             'Content-Type': 'text/plain;charset=utf-8',
           }
@@ -384,74 +594,104 @@
       }
     }
 
-    function migrateLegacyAbsentToHoliday() {
-      if (!attendanceData) return;
-      Object.keys(attendanceData).forEach(mKey => {
-        if (attendanceData[mKey]) {
-          Object.keys(attendanceData[mKey]).forEach(emp => {
-            if (attendanceData[mKey][emp]) {
-              Object.keys(attendanceData[mKey][emp]).forEach(d => {
-                if (attendanceData[mKey][emp][d] === 'A') attendanceData[mKey][emp][d] = 'H';
-              });
-            }
-          });
-        }
-      });
-    }
-
     function handleSync() {
-      saveStorage();
+      saveStorage(); // Trigger cloud sync manually
+      
       const saveBtn = document.getElementById('saveDataBtn');
       if (saveBtn) {
         const originalContent = saveBtn.innerHTML;
         saveBtn.innerHTML = `<i class="fa-solid fa-check text-emerald-200 text-sm"></i><span>Synced!</span>`;
-        saveBtn.classList.replace('bg-emerald-600', 'bg-emerald-800');
+        saveBtn.classList.remove('bg-emerald-600', 'hover:bg-emerald-700');
+        saveBtn.classList.add('bg-emerald-800');
         setTimeout(() => {
           saveBtn.innerHTML = originalContent;
-          saveBtn.classList.replace('bg-emerald-800', 'bg-emerald-600');
+          saveBtn.classList.remove('bg-emerald-800');
+          saveBtn.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
         }, 1800);
       }
-      showToast(`Data syncing to Google Sheets!`);
+      
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      showToast(`Data successfully synced to Google Sheets at ${timeStr}!`);
     }
 
-    function getMonthKey(y, m) { return `${y}-${m}`; }
-    function getDaysInMonth(year, month) { return new Date(year, month + 1, 0).getDate(); }
+    function getMonthKey(y, m) {
+      return `${y}-${m}`;
+    }
+
+    function getDaysInMonth(year, month) {
+      return new Date(year, month + 1, 0).getDate();
+    }
 
     function getEffectiveStatus(y, m, d, emp) {
       const monthKey = getMonthKey(y, m);
       const userValue = attendanceData[monthKey]?.[emp]?.[d];
+
       if (userValue !== undefined) {
         if (userValue === 'A') return 'H';
         return userValue === 'EMPTY' ? '' : userValue;
       }
+
       const dow = new Date(y, m, d).getDay();
-      if (dow === 0 || dow === 6) return 'WO';
+      if (dow === 0 || dow === 6) {
+        return 'WO';
+      }
+
       return 'P';
     }
 
     function getAnnualCycleMonths(startYear) {
       const cycle = [];
-      for (let m = 5; m <= 11; m++) cycle.push({ year: startYear, month: m });
-      for (let m = 0; m <= 4; m++) cycle.push({ year: startYear + 1, month: m });
+      for (let m = 5; m <= 11; m++) {
+        cycle.push({ year: startYear, month: m });
+      }
+      for (let m = 0; m <= 4; m++) {
+        cycle.push({ year: startYear + 1, month: m });
+      }
       return cycle;
     }
 
+    function findMatchingEmployee(nameStr) {
+      if (!nameStr) return null;
+      const clean = nameStr.trim().toLowerCase();
+      const match = employeeRoster.find(e => e.name.toLowerCase() === clean);
+      return match ? match.name : null;
+    }
+
+    // Converts any standard YYYY-MM-DD input date to exact DD-MM-YYYY format
     function formatToDDMMYYYY(dateStr) {
-      if (!dateStr || typeof dateStr !== 'string' || !dateStr.trim()) return 'Not Set';
-      const parts = dateStr.trim().split(/[-/]/);
+      if (!dateStr || typeof dateStr !== 'string') return 'Not Set';
+      const clean = dateStr.trim();
+      if (!clean) return 'Not Set';
+      const parts = clean.split(/[-/]/);
       if (parts.length === 3) {
-        if (parts[0].length === 4) return `${String(parts[2]).padStart(2, '0')}-${String(parts[1]).padStart(2, '0')}-${parts[0]}`;
-        if (parts[2].length === 4) return `${String(parts[0]).padStart(2, '0')}-${String(parts[1]).padStart(2, '0')}-${parts[2]}`;
+        // Handle YYYY-MM-DD
+        if (parts[0].length === 4) {
+          const y = parts[0];
+          const m = String(parts[1]).padStart(2, '0');
+          const d = String(parts[2]).padStart(2, '0');
+          return `${d}-${m}-${y}`;
+        }
+        // Handle DD-MM-YYYY
+        if (parts[2].length === 4) {
+          const d = String(parts[0]).padStart(2, '0');
+          const m = String(parts[1]).padStart(2, '0');
+          const y = parts[2];
+          return `${d}-${m}-${y}`;
+        }
       }
-      return dateStr;
+      return clean;
     }
 
     function formatDisplayDate(dateStr) {
       const formatted = formatToDDMMYYYY(dateStr);
-      if (formatted === 'Not Set') return '<span class="text-slate-400 font-normal italic">Not Set</span>';
+      if (formatted === 'Not Set') {
+        return '<span class="text-slate-400 font-normal italic">Not Set</span>';
+      }
       return `<span class="font-bold text-slate-800 tracking-wide">${formatted}</span>`;
     }
 
+    // --- EMPLOYEE ROSTER MANAGEMENT FUNCTIONS ---
     function openEmployeeModal() {
       renderEmployeeListModal();
       document.getElementById('newEmpName').value = '';
@@ -459,12 +699,18 @@
       document.getElementById('employeeModal').classList.remove('hidden');
     }
 
-    function closeEmployeeModal() { document.getElementById('employeeModal').classList.add('hidden'); }
+    function closeEmployeeModal() {
+      document.getElementById('employeeModal').classList.add('hidden');
+    }
 
     function renderEmployeeListModal() {
       const container = document.getElementById('employeeListContainer');
-      document.getElementById('empCountDisplay').textContent = employeeRoster.length;
+      const countDisplay = document.getElementById('empCountDisplay');
+      if (!container) return;
+
+      countDisplay.textContent = employeeRoster.length;
       let html = '';
+
       employeeRoster.forEach((emp, index) => {
         html += `
           <div class="bg-slate-50 border border-slate-200 rounded-xl p-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
@@ -473,44 +719,77 @@
               <input type="text" value="${emp.name}" onchange="updateEmployeeName(${index}, this.value)" class="font-bold text-slate-800 bg-white border border-slate-300 rounded-md px-2 py-1 flex-1 focus:ring-1 focus:ring-indigo-500 focus:outline-none">
             </div>
             <div class="flex items-center gap-2">
-              <span class="text-[10px] text-slate-400 font-semibold uppercase">DOJ:</span>
-              <input type="date" value="${emp.doj || ''}" onchange="updateEmployeeDoj(${index}, this.value)" class="bg-white border border-slate-300 text-slate-700 text-xs rounded-md px-1.5 py-1 focus:outline-none">
-              <button onclick="deleteEmployee(${index})" class="text-rose-500 hover:text-rose-700 hover:bg-rose-50 p-1.5 rounded-lg"><i class="fa-regular fa-trash-can"></i></button>
+              <div class="flex items-center gap-1">
+                <span class="text-[10px] text-slate-400 font-semibold uppercase">DOJ:</span>
+                <input type="date" value="${emp.doj || ''}" onchange="updateEmployeeDoj(${index}, this.value)" class="bg-white border border-slate-300 text-slate-700 text-xs rounded-md px-1.5 py-1 focus:ring-1 focus:ring-indigo-500 focus:outline-none">
+              </div>
+              <button onclick="deleteEmployee(${index})" class="text-rose-500 hover:text-rose-700 hover:bg-rose-50 p-1.5 rounded-lg transition" title="Delete employee">
+                <i class="fa-regular fa-trash-can"></i>
+              </button>
             </div>
           </div>
         `;
       });
-      container.innerHTML = html || `<div class="text-center py-4 text-xs text-slate-400 italic">No employees configured. Add one above.</div>`;
+
+      if (employeeRoster.length === 0) {
+        html = `<div class="text-center py-4 text-xs text-slate-400 italic">No employees configured. Add one above.</div>`;
+      }
+
+      container.innerHTML = html;
     }
 
     function addNewEmployee() {
-      const name = document.getElementById('newEmpName').value.trim();
-      const doj = document.getElementById('newEmpDoj').value.trim();
-      if (!name) return showToast("Please enter an employee name.");
-      if (employeeRoster.some(e => e.name.toLowerCase() === name.toLowerCase())) return showToast("Employee already exists.");
+      const nameInput = document.getElementById('newEmpName');
+      const dojInput = document.getElementById('newEmpDoj');
+      const name = nameInput.value.trim();
+      const doj = dojInput.value.trim();
+
+      if (!name) {
+        showToast("Please enter an employee name.");
+        return;
+      }
+
+      const exists = employeeRoster.some(e => e.name.toLowerCase() === name.toLowerCase());
+      if (exists) {
+        showToast("An employee with this name already exists.");
+        return;
+      }
+
       employeeRoster.push({ name, doj });
       saveStorage();
       renderEmployeeListModal();
       renderTable();
       renderAnnualOverview();
-      document.getElementById('newEmpName').value = '';
-      document.getElementById('newEmpDoj').value = '';
-      showToast(`Added ${name}`);
+      nameInput.value = '';
+      dojInput.value = '';
+      showToast(`Added ${name} (DOJ: ${formatToDDMMYYYY(doj)}).`);
     }
 
     function updateEmployeeName(index, newName) {
       newName = newName.trim();
-      if (!newName) return renderEmployeeListModal();
+      if (!newName) {
+        showToast("Name cannot be empty.");
+        renderEmployeeListModal();
+        return;
+      }
+
       const oldName = employeeRoster[index].name;
       if (oldName === newName) return;
-      if (employeeRoster.some((e, i) => i !== index && e.name.toLowerCase() === newName.toLowerCase())) return showToast("Name already exists.");
-      
+
+      const exists = employeeRoster.some((e, i) => i !== index && e.name.toLowerCase() === newName.toLowerCase());
+      if (exists) {
+        showToast("Another employee with this name already exists.");
+        renderEmployeeListModal();
+        return;
+      }
+
       Object.keys(attendanceData).forEach(mKey => {
-        if (attendanceData[mKey]?.[oldName]) {
+        if (attendanceData[mKey] && attendanceData[mKey][oldName]) {
           attendanceData[mKey][newName] = attendanceData[mKey][oldName];
           delete attendanceData[mKey][oldName];
         }
       });
+
       employeeRoster[index].name = newName;
       saveStorage();
       renderTable();
@@ -522,98 +801,481 @@
       employeeRoster[index].doj = newDoj;
       saveStorage();
       renderAnnualOverview();
+      showToast(`Updated DOJ to ${formatToDDMMYYYY(newDoj)} for ${employeeRoster[index].name}.`);
     }
 
     function deleteEmployee(index) {
-      if (!confirm(`Remove ${employeeRoster[index].name}?`)) return;
+      const emp = employeeRoster[index];
+      if (!confirm(`Are you sure you want to remove ${emp.name}? This will remove them from the active display.`)) {
+        return;
+      }
+
       employeeRoster.splice(index, 1);
       saveStorage();
       renderEmployeeListModal();
       renderTable();
       renderAnnualOverview();
+      showToast(`Removed ${emp.name} from employee list.`);
     }
 
+    // --- PURE VECTOR PDF GENERATOR: MONTHLY GRID + ANNUAL OVERVIEW WITH DD-MM-YYYY DOJ ---
     function generateMonthPDF(year, month) {
       const { jsPDF } = window.jspdf;
       const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      const dayNames = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
       const daysCount = getDaysInMonth(year, month);
-      
-      const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
-      doc.setFont("helvetica", "bold"); doc.setFontSize(15); doc.text("SKRUPAM ENTERPRISES", 28, 30);
-      doc.setFontSize(10); doc.setTextColor(79, 70, 229); doc.text(`Attendance Report — ${monthNames[month]} ${year}`, 28, 44);
-      
-      const headers = [{ header: 'Employee', dataKey: 'emp' }];
-      for (let d = 1; d <= daysCount; d++) headers.push({ header: `${d}`, dataKey: `d_${d}` });
-      headers.push({ header: 'WO', dataKey: 'wo' }, { header: 'BH', dataKey: 'bh' }, { header: 'H', dataKey: 'h' }, { header: 'LWP', dataKey: 'lwp' }, { header: 'Half', dataKey: 'half' }, { header: 'Leaves', dataKey: 'total' });
+      const monthTitle = `${monthNames[month]} ${year}`;
 
-      const tableData = employeeRoster.map(empObj => {
+      showToast(`Generating complete vector PDF report for ${monthTitle}...`);
+
+      const doc = new jsPDF({
+        orientation: 'landscape',
+        unit: 'pt',
+        format: 'a4'
+      });
+
+      const pageWidth = doc.internal.pageSize.getWidth();
+
+      // Top Header
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(15);
+      doc.setTextColor(15, 23, 42);
+      doc.text("SKRUPAM ENTERPRISES", 28, 30);
+
+      doc.setFontSize(10);
+      doc.setTextColor(79, 70, 229);
+      doc.text(`Monthly Attendance & Annual Overview Report — ${monthTitle}`, 28, 44);
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7.5);
+      doc.setTextColor(100, 116, 139);
+      const generatedAt = `Annual Cycle: 1st June ${selectedCycleStartYear} to 31st May ${selectedCycleStartYear + 1}   |   Generated: ${new Date().toLocaleDateString('en-GB')} ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+      doc.text(generatedAt, pageWidth - 28, 38, { align: 'right' });
+
+      // Legend Bar
+      doc.setDrawColor(226, 232, 240);
+      doc.setFillColor(248, 250, 252);
+      doc.roundedRect(28, 52, pageWidth - 56, 17, 3, 3, "FD");
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(7);
+      doc.setTextColor(51, 65, 85);
+      doc.text("STATUS KEYS:", 34, 63);
+
+      const legends = [
+        { label: "P: Present", color: [21, 128, 61] },
+        { label: "WO: Week Off (Sat/Sun)", color: [3, 105, 161] },
+        { label: "BH: Bank Holiday", color: [126, 34, 206] },
+        { label: "H: Holiday", color: [225, 29, 72] },
+        { label: "LWP: Leave Without Pay", color: [220, 38, 38] },
+        { label: "FH/SH: Half Day (0.5)", color: [217, 119, 6] }
+      ];
+
+      let lx = 98;
+      legends.forEach(item => {
+        doc.setTextColor(item.color[0], item.color[1], item.color[2]);
+        doc.text(item.label, lx, 63);
+        lx += doc.getTextWidth(item.label) + 14;
+      });
+
+      // SECTION 1: Monthly Attendance Table
+      const headers = [
+        { header: 'Employee', dataKey: 'emp' }
+      ];
+
+      for (let d = 1; d <= daysCount; d++) {
+        const dObj = new Date(year, month, d);
+        const dow = dayNames[dObj.getDay()];
+        headers.push({
+          header: `${dow}\n${d}`,
+          dataKey: `d_${d}`
+        });
+      }
+
+      headers.push(
+        { header: 'WO', dataKey: 'wo' },
+        { header: 'BH', dataKey: 'bh' },
+        { header: 'H', dataKey: 'h' },
+        { header: 'LWP', dataKey: 'lwp' },
+        { header: 'Half', dataKey: 'half' },
+        { header: 'Month\nLeaves', dataKey: 'total' }
+      );
+
+      const tableData = [];
+      employeeRoster.forEach(empObj => {
         const emp = empObj.name;
-        let counts = { wo:0, bh:0, h:0, lwp:0, half:0 };
+        let woCount = 0;
+        let bhCount = 0;
+        let holidayCount = 0;
+        let lwpCount = 0;
+        let halfCount = 0;
+
         const row = { emp };
+
         for (let d = 1; d <= daysCount; d++) {
           const st = getEffectiveStatus(year, month, d, emp);
           row[`d_${d}`] = st || '';
-          if (st === 'WO') counts.wo++; else if (st === 'BH') counts.bh++; else if (st === 'H') counts.h++; else if (st === 'LWP') counts.lwp++; else if (st === 'FH' || st === 'SH') counts.half++;
+
+          if (st === 'WO') woCount++;
+          else if (st === 'BH') bhCount++;
+          else if (st === 'H') holidayCount++;
+          else if (st === 'LWP') lwpCount++;
+          else if (st === 'FH' || st === 'SH') halfCount++;
         }
-        return { ...row, ...counts, total: counts.h + counts.lwp + (counts.half * 0.5) };
+
+        const totalMonthLeaves = holidayCount + lwpCount + (halfCount * 0.5);
+
+        row.wo = woCount;
+        row.bh = bhCount;
+        row.h = holidayCount;
+        row.lwp = lwpCount;
+        row.half = halfCount;
+        row.total = totalMonthLeaves;
+
+        tableData.push(row);
       });
 
-      doc.autoTable({ columns: headers, body: tableData, startY: 60, styles: { fontSize: 7, cellPadding: 2, lineWidth: 0.5 } });
-      doc.save(`Attendance_${monthNames[month]}_${year}.pdf`);
+      const colStyles = {
+        emp: { fontStyle: 'bold', halign: 'left', cellWidth: 54, textColor: [30, 41, 59] },
+        wo: { fontStyle: 'bold', halign: 'center', cellWidth: 19, fillColor: [240, 249, 255], textColor: [3, 105, 161] },
+        bh: { fontStyle: 'bold', halign: 'center', cellWidth: 19, fillColor: [250, 245, 255], textColor: [126, 34, 206] },
+        h: { fontStyle: 'bold', halign: 'center', cellWidth: 17, textColor: [225, 29, 72] },
+        lwp: { fontStyle: 'bold', halign: 'center', cellWidth: 20, textColor: [220, 38, 38] },
+        half: { fontStyle: 'bold', halign: 'center', cellWidth: 18, textColor: [217, 119, 6] },
+        total: { fontStyle: 'bold', halign: 'center', cellWidth: 32, fillColor: [254, 226, 226], textColor: [136, 19, 55] }
+      };
+
+      for (let d = 1; d <= daysCount; d++) {
+        colStyles[`d_${d}`] = { halign: 'center', cellWidth: 'auto', fontSize: 6.8 };
+      }
+
+      doc.autoTable({
+        columns: headers,
+        body: tableData,
+        startY: 76,
+        margin: { left: 28, right: 28 },
+        theme: 'grid',
+        tableWidth: 'auto',
+        styles: {
+          fontSize: 7,
+          cellPadding: 2.2,
+          lineWidth: 0.5,
+          lineColor: [203, 213, 225],
+          font: 'helvetica'
+        },
+        headStyles: {
+          fillColor: [241, 245, 249],
+          textColor: [51, 65, 85],
+          fontStyle: 'bold',
+          halign: 'center',
+          valign: 'middle'
+        },
+        columnStyles: colStyles,
+        didParseCell: function(data) {
+          if (data.section === 'head' && data.column.dataKey.startsWith('d_')) {
+            const dayNum = parseInt(data.column.dataKey.replace('d_', ''), 10);
+            const dow = new Date(year, month, dayNum).getDay();
+            if (dow === 0 || dow === 6) {
+              data.cell.styles.fillColor = [224, 242, 254];
+              data.cell.styles.textColor = [3, 105, 161];
+            }
+          }
+
+          if (data.section === 'body' && data.column.dataKey.startsWith('d_')) {
+            const val = data.cell.raw;
+            if (val === 'P') {
+              data.cell.styles.fillColor = [220, 252, 231];
+              data.cell.styles.textColor = [21, 128, 61];
+              data.cell.styles.fontStyle = 'bold';
+            } else if (val === 'WO') {
+              data.cell.styles.fillColor = [224, 242, 254];
+              data.cell.styles.textColor = [3, 105, 161];
+              data.cell.styles.fontStyle = 'bold';
+            } else if (val === 'BH') {
+              data.cell.styles.fillColor = [243, 232, 255];
+              data.cell.styles.textColor = [126, 34, 206];
+              data.cell.styles.fontStyle = 'bold';
+            } else if (val === 'H') {
+              data.cell.styles.fillColor = [255, 228, 230];
+              data.cell.styles.textColor = [190, 18, 60];
+              data.cell.styles.fontStyle = 'bold';
+            } else if (val === 'LWP') {
+              data.cell.styles.fillColor = [254, 226, 226];
+              data.cell.styles.textColor = [185, 28, 28];
+              data.cell.styles.fontStyle = 'bold';
+            } else if (val === 'FH' || val === 'SH') {
+              data.cell.styles.fillColor = [254, 243, 199];
+              data.cell.styles.textColor = [180, 83, 9];
+              data.cell.styles.fontStyle = 'bold';
+            }
+          }
+        }
+      });
+
+      // SECTION 2: Annual Overview directly beneath with DD-MM-YYYY DOJ
+      const monthTableBottomY = doc.lastAutoTable.finalY;
+      const annualStartY = monthTableBottomY + 16;
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9.5);
+      doc.setTextColor(15, 23, 42);
+      doc.text(`ANNUAL OVERVIEW SUMMARY (Company Cycle: 1st June ${selectedCycleStartYear} to 31st May ${selectedCycleStartYear + 1})`, 28, annualStartY);
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7.5);
+      doc.setTextColor(100, 116, 139);
+      doc.text("Cumulative 12-Month Leaves & Holidays (Excludes WO & BH)", pageWidth - 28, annualStartY, { align: 'right' });
+
+      const cycleMonths = getAnnualCycleMonths(selectedCycleStartYear);
+      const annualHeaders = [
+        { header: 'Employee', dataKey: 'emp' },
+        { header: 'Date of Joining', dataKey: 'doj' },
+        { header: 'Week Offs (WO)', dataKey: 'totalWO' },
+        { header: 'Bank Holidays (BH)', dataKey: 'totalBH' },
+        { header: 'Holiday (H)', dataKey: 'totalHoliday' },
+        { header: 'Leave Without Pay (LWP)', dataKey: 'totalLWP' },
+        { header: 'Half Days (FH+SH)', dataKey: 'totalHalf' },
+        { header: 'Total Annual Holidays / Leaves', dataKey: 'annualLeaves' }
+      ];
+
+      const annualData = [];
+      employeeRoster.forEach(empObj => {
+        const emp = empObj.name;
+        let totalWO = 0;
+        let totalBH = 0;
+        let totalHoliday = 0;
+        let totalLWP = 0;
+        let totalHalf = 0;
+
+        cycleMonths.forEach(({ year: cyYear, month: cyMonth }) => {
+          const daysInM = getDaysInMonth(cyYear, cyMonth);
+          for (let d = 1; d <= daysInM; d++) {
+            const st = getEffectiveStatus(cyYear, cyMonth, d, emp);
+            if (st === 'WO') totalWO++;
+            else if (st === 'BH') totalBH++;
+            else if (st === 'H') totalHoliday++;
+            else if (st === 'LWP') totalLWP++;
+            else if (st === 'FH' || st === 'SH') totalHalf++;
+          }
+        });
+
+        const annualLeaves = totalHoliday + totalLWP + (totalHalf * 0.5);
+
+        annualData.push({
+          emp,
+          doj: formatToDDMMYYYY(empObj.doj), // Formats cleanly into DD-MM-YYYY
+          totalWO,
+          totalBH,
+          totalHoliday,
+          totalLWP,
+          totalHalf,
+          annualLeaves
+        });
+      });
+
+      doc.autoTable({
+        columns: annualHeaders,
+        body: annualData,
+        startY: annualStartY + 6,
+        margin: { left: 28, right: 28 },
+        theme: 'grid',
+        styles: {
+          fontSize: 7.5,
+          cellPadding: 3,
+          lineWidth: 0.5,
+          lineColor: [203, 213, 225],
+          font: 'helvetica'
+        },
+        headStyles: {
+          fillColor: [241, 245, 249],
+          textColor: [51, 65, 85],
+          fontStyle: 'bold',
+          halign: 'center',
+          valign: 'middle'
+        },
+        columnStyles: {
+          emp: { fontStyle: 'bold', halign: 'left', cellWidth: 75, textColor: [30, 41, 59] },
+          doj: { halign: 'center', cellWidth: 80, textColor: [79, 70, 229], fontStyle: 'bold' },
+          totalWO: { halign: 'center', cellWidth: 'auto', fillColor: [240, 249, 255], textColor: [3, 105, 161], fontStyle: 'bold' },
+          totalBH: { halign: 'center', cellWidth: 'auto', fillColor: [250, 245, 255], textColor: [126, 34, 206], fontStyle: 'bold' },
+          totalHoliday: { halign: 'center', cellWidth: 'auto', textColor: [225, 29, 72], fontStyle: 'bold' },
+          totalLWP: { halign: 'center', cellWidth: 'auto', textColor: [220, 38, 38], fontStyle: 'bold' },
+          totalHalf: { halign: 'center', cellWidth: 'auto', textColor: [217, 119, 6], fontStyle: 'bold' },
+          annualLeaves: { halign: 'center', cellWidth: 120, fillColor: [254, 226, 226], textColor: [136, 19, 55], fontStyle: 'bold' }
+        }
+      });
+
+      const finalY = doc.lastAutoTable.finalY + 16;
+      doc.setFontSize(7);
+      doc.setTextColor(100, 116, 139);
+      doc.setFont("helvetica", "normal");
+      doc.text("* Note: Total Holidays / Leaves formula strictly = Holiday + LWP + (Half x 0.5). Week Offs (WO) and Bank Holidays (BH) are strictly excluded.", 28, finalY);
+      doc.text("Authorized Signatory: ____________________________", pageWidth - 28, finalY, { align: 'right' });
+
+      doc.save(`SKRUPAM_Attendance_Report_${monthNames[month]}_${year}.pdf`);
+      showToast(`Vector PDF Report with Annual Overview downloaded for ${monthTitle}!`);
     }
 
     function renderTable() {
       const cycleMonths = getAnnualCycleMonths(selectedCycleStartYear);
       const allMonthsContainer = document.getElementById('allMonthsContainer');
+
       const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
       const dayNames = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
-      
+
       let containerHtml = '';
+
       cycleMonths.forEach(({ year, month }) => {
         const mKey = getMonthKey(year, month);
         const daysCount = getDaysInMonth(year, month);
+        const monthTitle = `${monthNames[month]} ${year}`;
+        const isCurrentRealMonth = (year === realTodayYear && month === realTodayMonth);
+
         if (!attendanceData[mKey]) attendanceData[mKey] = {};
-        employeeRoster.forEach(emp => { if (!attendanceData[mKey][emp.name]) attendanceData[mKey][emp.name] = {}; });
+        employeeRoster.forEach(emp => {
+          if (!attendanceData[mKey][emp.name]) attendanceData[mKey][emp.name] = {};
+        });
 
         containerHtml += `
-          <article class="snap-month-card bg-white rounded-2xl shadow-sm border border-slate-200/90 overflow-hidden">
-            <div class="px-5 py-3 bg-gradient-to-r from-slate-50 to-slate-50 border-b flex justify-between gap-3">
-              <div class="flex items-center gap-2.5 font-bold text-slate-900">${monthNames[month]} ${year}</div>
-              <div class="flex gap-2">
-                <button onclick="generateMonthPDF(${year}, ${month})" class="px-2 py-1 text-xs text-rose-700 bg-rose-50 rounded border border-rose-200">PDF</button>
+          <article id="month-section-${mKey}" data-mkey="${mKey}" class="snap-month-card bg-white rounded-2xl shadow-sm border border-slate-200/90 overflow-hidden">
+            <div class="px-5 py-3 bg-gradient-to-r from-slate-50 via-white to-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
+              <div class="flex items-center gap-2.5">
+                <div class="text-indigo-600 text-sm sm:text-base">
+                  <i class="fa-solid fa-calendar-days"></i>
+                </div>
+                <h2 class="text-sm sm:text-base font-bold text-slate-900 leading-tight">
+                  ${monthTitle}
+                </h2>
+                <span class="text-xs text-slate-400 font-medium">(${daysCount} Days)</span>
+                ${isCurrentRealMonth ? '<span class="text-[11px] bg-purple-100 text-purple-700 font-bold px-2 py-0.5 rounded-full border border-purple-200 animate-pulse">Current Month</span>' : ''}
+              </div>
+
+              <div class="flex items-center gap-2">
+                <span class="text-[11px] text-slate-400 italic hidden sm:inline">
+                  <i class="fa-solid fa-arrow-pointer mr-1 text-indigo-400"></i>Click date to update all
+                </span>
+
+                <button onclick="generateMonthPDF(${year}, ${month})" class="px-2.5 py-1 text-xs font-semibold rounded-lg text-rose-700 hover:text-white bg-rose-50 hover:bg-rose-600 border border-rose-200 hover:border-rose-600 transition flex items-center gap-1.5 shadow-2xs" title="Export ${monthTitle} attendance and annual overview as vector PDF">
+                  <i class="fa-solid fa-file-pdf text-rose-500 hover:text-white"></i> PDF Report
+                </button>
+
+                <button onclick="resetSpecificMonth(${year}, ${month})" class="px-2.5 py-1 text-xs font-medium rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 transition flex items-center gap-1.5" title="Reset this month to default">
+                  <i class="fa-solid fa-rotate-left text-slate-400"></i> Reset Month
+                </button>
               </div>
             </div>
+
             <div class="overflow-x-auto relative">
               <table class="w-full text-left border-collapse text-xs select-none">
                 <thead class="bg-slate-50 text-slate-700 font-semibold sticky-header">
-                  <tr><th class="sticky-corner-emp bg-slate-50 py-2.5 px-3 border-r border-b">Employee</th>`;
+                  <tr>
+                    <th class="sticky-corner-emp bg-slate-50 py-2.5 px-3 text-left w-36 border-r border-b border-slate-200 font-bold text-slate-800">
+                      Employee
+                    </th>`;
+
         for (let d = 1; d <= daysCount; d++) {
-          const dayOfWeek = new Date(year, month, d).getDay();
-          const colBg = (dayOfWeek === 0 || dayOfWeek === 6) ? 'bg-sky-50 text-sky-800' : 'bg-slate-50';
-          containerHtml += `<th class="py-2 px-1 text-center border-r border-b cursor-pointer ${colBg}" onclick="handleDayHeaderClick(${year}, ${month}, ${d})">${dayNames[dayOfWeek]}<br>${d}</th>`;
+          const dObj = new Date(year, month, d);
+          const dayOfWeek = dObj.getDay();
+          const isSun = dayOfWeek === 0;
+          const isSat = dayOfWeek === 6;
+          const colBg = (isSun || isSat) ? 'bg-sky-50 text-sky-800 font-bold' : 'bg-slate-50 text-slate-700';
+
+          containerHtml += `
+            <th class="py-2 px-1 text-center border-r border-b border-slate-200 min-w-[34px] cursor-pointer hover:bg-indigo-50 hover:text-indigo-800 transition group ${colBg}"
+                onclick="handleDayHeaderClick(${year}, ${month}, ${d})"
+                title="Click to update all employees on ${monthNames[month]} ${d}">
+              <div class="text-[10px] uppercase font-semibold group-hover:text-indigo-600">${dayNames[dayOfWeek]}</div>
+              <div class="text-xs font-bold flex items-center justify-center gap-0.5">
+                <span>${d}</span>
+                <i class="fa-solid fa-pen text-[8px] opacity-0 group-hover:opacity-100 text-indigo-500 transition-opacity"></i>
+              </div>
+            </th>`;
         }
-        containerHtml += `<th class="py-2 px-2 text-center border-r border-b">WO</th><th class="py-2 px-2 text-center border-r border-b">BH</th><th class="py-2 px-2 text-center border-r border-b">Holiday</th><th class="py-2 px-2 text-center border-r border-b">LWP</th><th class="py-2 px-2 text-center border-r border-b">Half</th><th class="py-2 px-3 text-center border-b">Total</th></tr></thead>
+
+        containerHtml += `
+                    <th class="py-2 px-2 text-center border-r border-b border-slate-200 text-sky-800 font-bold bg-sky-50 min-w-[46px]" title="Week Offs (Sat &amp; Sun) - Informational">WO</th>
+                    <th class="py-2 px-2 text-center border-r border-b border-slate-200 text-purple-700 font-bold bg-purple-50 min-w-[46px]" title="Bank Holidays - Informational">BH</th>
+                    <th class="py-2 px-2 text-center border-r border-b border-slate-200 text-rose-700 font-bold bg-slate-50 min-w-[50px]">Holiday</th>
+                    <th class="py-2 px-2 text-center border-r border-b border-slate-200 text-red-700 font-bold bg-slate-50 min-w-[46px]">LWP</th>
+                    <th class="py-2 px-2 text-center border-r border-b border-slate-200 text-amber-700 font-bold bg-slate-50 min-w-[48px]">Half</th>
+                    <th class="py-2 px-3 text-center border-b border-slate-200 text-rose-950 font-black bg-rose-100 min-w-[95px]" title="Total Holidays / Leaves = Holiday + LWP + (Half * 0.5)">
+                      Total Holidays / Leaves
+                    </th>
+                  </tr>
+                </thead>
                 <tbody class="divide-y divide-slate-100 bg-white">`;
 
         employeeRoster.forEach(empObj => {
           const emp = empObj.name;
-          let counts = { wo:0, bh:0, h:0, lwp:0, half:0 };
+          let woCount = 0;
+          let bhCount = 0;
+          let holidayCount = 0;
+          let lwpCount = 0;
+          let halfCount = 0;
+
           for (let d = 1; d <= daysCount; d++) {
             const st = getEffectiveStatus(year, month, d, emp);
-            if (st === 'WO') counts.wo++; else if (st === 'BH') counts.bh++; else if (st === 'H') counts.h++; else if (st === 'LWP') counts.lwp++; else if (st === 'FH' || st === 'SH') counts.half++;
+            if (st === 'WO') woCount++;
+            else if (st === 'BH') bhCount++;
+            else if (st === 'H') holidayCount++;
+            else if (st === 'LWP') lwpCount++;
+            else if (st === 'FH' || st === 'SH') halfCount++;
           }
-          containerHtml += `<tr><td class="sticky-col-emp bg-white py-2 px-3 border-r border-b font-bold">${emp}</td>`;
+
+          const totalHolidaysAndLeaves = holidayCount + lwpCount + (halfCount * 0.5);
+
+          containerHtml += `
+            <tr class="hover:bg-slate-50/80 transition-colors">
+              <td class="sticky-col-emp bg-white py-2 px-3 border-r border-b border-slate-100 font-bold text-slate-800 flex items-center gap-2">
+                <span class="w-5 h-5 rounded-full bg-purple-100 text-purple-700 inline-flex items-center justify-center font-bold text-[10px]">${emp.charAt(0)}</span>
+                <span>${emp}</span>
+              </td>`;
+
           for (let d = 1; d <= daysCount; d++) {
             const status = getEffectiveStatus(year, month, d, emp);
-            const badgeClass = status && STATUS_MAP[status] ? STATUS_MAP[status].bg : 'bg-white border text-slate-300';
-            const badgeContent = status && STATUS_MAP[status] ? STATUS_MAP[status].label : '&nbsp;';
-            containerHtml += `<td class="p-1 text-center border-r border-b cursor-pointer" onclick="handleCellClick('${emp}', ${year}, ${month}, ${d})"><div class="h-6 w-6 sm:h-7 sm:w-7 mx-auto rounded-md flex items-center justify-center text-[10px] ${badgeClass}">${badgeContent}</div></td>`;
+            const dObj = new Date(year, month, d);
+            const isSun = dObj.getDay() === 0;
+            const isSat = dObj.getDay() === 6;
+
+            let badgeContent = '&nbsp;';
+            let badgeClass = 'text-slate-300 hover:bg-slate-100 hover:border-slate-300 border border-dashed border-slate-200';
+
+            if (status && STATUS_MAP[status]) {
+              badgeContent = STATUS_MAP[status].label;
+              badgeClass = `${STATUS_MAP[status].bg}`;
+            } else {
+              badgeClass = 'bg-white hover:bg-slate-100 border border-dashed border-slate-200 text-slate-300';
+            }
+
+            containerHtml += `
+              <td class="p-1 text-center border-r border-b border-slate-100 cursor-pointer" onclick="handleCellClick('${emp}', ${year}, ${month}, ${d})">
+                <div class="h-6 w-6 sm:h-7 sm:w-7 mx-auto rounded-md flex items-center justify-center text-[10px] transition-all transform active:scale-90 ${badgeClass}" title="${emp} - ${monthTitle} Day ${d} (${isSat ? 'Saturday' : isSun ? 'Sunday' : 'Weekday'}): ${status ? STATUS_MAP[status].name + ' (Click to change)' : 'Cleared'}">
+                  ${badgeContent}
+                </div>
+              </td>`;
           }
-          containerHtml += `<td class="py-2 px-2 text-center border-r border-b">${counts.wo}</td><td class="py-2 px-2 text-center border-r border-b">${counts.bh}</td><td class="py-2 px-2 text-center border-r border-b">${counts.h}</td><td class="py-2 px-2 text-center border-r border-b">${counts.lwp}</td><td class="py-2 px-2 text-center border-r border-b">${counts.half}</td><td class="py-2 px-3 text-center border-b font-black text-sm">${counts.h + counts.lwp + (counts.half * 0.5)}</td></tr>`;
+
+          containerHtml += `
+              <td class="py-2 px-2 text-center border-r border-b border-slate-100 text-sky-800 font-bold bg-sky-50/50">${woCount}</td>
+              <td class="py-2 px-2 text-center border-r border-b border-slate-100 text-purple-700 font-bold bg-purple-50/50">${bhCount}</td>
+              <td class="py-2 px-2 text-center border-r border-b border-slate-100 text-rose-700 font-bold">${holidayCount}</td>
+              <td class="py-2 px-2 text-center border-r border-b border-slate-100 text-red-700 font-bold">${lwpCount}</td>
+              <td class="py-2 px-2 text-center border-r border-b border-slate-100 text-amber-700 font-bold">${halfCount}</td>
+              <td class="py-2 px-3 text-center border-b border-slate-100 text-rose-950 font-black bg-rose-100 text-sm">
+                ${totalHolidaysAndLeaves}
+              </td>
+            </tr>`;
         });
-        containerHtml += `</tbody></table></div></article>`;
+
+        containerHtml += `
+                </tbody>
+              </table>
+            </div>
+          </article>`;
       });
+
       allMonthsContainer.innerHTML = containerHtml;
+      renderAnnualOverview();
       updateStickyMeasurements();
     }
 
@@ -622,10 +1284,14 @@
       if (!select) return;
       const currentSelectedVal = select.value;
       select.innerHTML = '';
+
       for (let y = 2026; y <= 2035; y++) {
         const opt = document.createElement('option');
-        opt.value = y; opt.textContent = `1st June ${y} – 31st May ${y + 1}`; select.appendChild(opt);
+        opt.value = y;
+        opt.textContent = `1st June ${y} – 31st May ${y + 1}`;
+        select.appendChild(opt);
       }
+
       select.value = currentSelectedVal || selectedCycleStartYear;
     }
 
@@ -633,51 +1299,117 @@
       initAnnualCycleDropdown();
       const cycleMonths = getAnnualCycleMonths(selectedCycleStartYear);
       const tbody = document.getElementById('annualSummaryBody');
+      if (!tbody) return;
+
       let html = '';
       employeeRoster.forEach(empObj => {
         const emp = empObj.name;
-        let counts = { wo:0, bh:0, h:0, lwp:0, half:0 };
+        let totalWO = 0;
+        let totalBH = 0;
+        let totalHoliday = 0;
+        let totalLWP = 0;
+        let totalHalf = 0;
+
         cycleMonths.forEach(({ year, month }) => {
-          for (let d = 1; d <= getDaysInMonth(year, month); d++) {
+          const daysInM = getDaysInMonth(year, month);
+          for (let d = 1; d <= daysInM; d++) {
             const st = getEffectiveStatus(year, month, d, emp);
-            if (st === 'WO') counts.wo++; else if (st === 'BH') counts.bh++; else if (st === 'H') counts.h++; else if (st === 'LWP') counts.lwp++; else if (st === 'FH' || st === 'SH') counts.half++;
+            if (st === 'WO') totalWO++;
+            else if (st === 'BH') totalBH++;
+            else if (st === 'H') totalHoliday++;
+            else if (st === 'LWP') totalLWP++;
+            else if (st === 'FH' || st === 'SH') totalHalf++;
           }
         });
-        html += `<tr class="hover:bg-slate-50"><td class="py-3 px-4 font-bold">${emp}</td><td class="py-3 px-3 text-center">${formatDisplayDate(empObj.doj)}</td><td class="py-3 px-3 text-center">${counts.wo}</td><td class="py-3 px-3 text-center">${counts.bh}</td><td class="py-3 px-3 text-center">${counts.h}</td><td class="py-3 px-3 text-center">${counts.lwp}</td><td class="py-3 px-3 text-center">${counts.half}</td><td class="py-3 px-3 text-center font-extrabold text-sm">${counts.h + counts.lwp + (counts.half * 0.5)}</td></tr>`;
+
+        const totalHolidaysAndLeaves = totalHoliday + totalLWP + (totalHalf * 0.5);
+
+        html += `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="py-3 px-4 font-bold text-slate-800 flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-purple-100 text-purple-700 inline-flex items-center justify-center font-bold text-xs">${emp.charAt(0)}</span>
+              ${emp}
+            </td>
+            <td class="py-3 px-3 text-center bg-indigo-50/30">
+              ${formatDisplayDate(empObj.doj)}
+            </td>
+            <td class="py-3 px-3 text-center font-bold text-sky-700 bg-sky-50/50">${totalWO}</td>
+            <td class="py-3 px-3 text-center font-bold text-purple-700 bg-purple-50/50">${totalBH}</td>
+            <td class="py-3 px-3 text-center font-semibold text-rose-600">${totalHoliday}</td>
+            <td class="py-3 px-3 text-center font-semibold text-red-600">${totalLWP}</td>
+            <td class="py-3 px-3 text-center font-semibold text-amber-600">${totalHalf}</td>
+            <td class="py-3 px-3 text-center font-extrabold text-rose-950 bg-rose-100 text-sm">
+              ${totalHolidaysAndLeaves}
+            </td>
+          </tr>`;
       });
+
       tbody.innerHTML = html;
     }
 
     function handleDayHeaderClick(year, month, day) {
       activeDayColumnTarget = { year, month, day };
+      const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+      const dObj = new Date(year, month, day);
+      const dayName = daysOfWeek[dObj.getDay()];
+
+      document.getElementById('modalDayColumnTitle').textContent = `${monthNames[month]} ${day}, ${year}`;
+      document.getElementById('modalDayColumnSubtitle').textContent = `${dayName} • Apply to all ${employeeRoster.length} employees`;
+      document.getElementById('dayModalBadge').textContent = `All ${employeeRoster.length} Employees`;
       document.getElementById('dayColumnModal').classList.remove('hidden');
     }
 
-    function closeDayColumnModal() { document.getElementById('dayColumnModal').classList.add('hidden'); activeDayColumnTarget = null; }
+    function closeDayColumnModal() {
+      document.getElementById('dayColumnModal').classList.add('hidden');
+      activeDayColumnTarget = null;
+    }
 
     function setDayColumnStatus(status) {
       if (!activeDayColumnTarget) return;
       const { year, month, day } = activeDayColumnTarget;
       const monthKey = getMonthKey(year, month);
-      const isWeekend = (new Date(year, month, day).getDay() % 6 === 0);
+      const dow = new Date(year, month, day).getDay();
+      const isWeekend = (dow === 0 || dow === 6);
 
       if (!attendanceData[monthKey]) attendanceData[monthKey] = {};
+
       employeeRoster.forEach(empObj => {
         const emp = empObj.name;
         if (!attendanceData[monthKey][emp]) attendanceData[monthKey][emp] = {};
-        if (status === 'EMPTY' || (!isWeekend && status === 'P') || (isWeekend && status === 'WO')) {
+
+        if (status === 'EMPTY') {
+          delete attendanceData[monthKey][emp][day];
+        } else if (!isWeekend && status === 'P') {
+          delete attendanceData[monthKey][emp][day];
+        } else if (isWeekend && status === 'WO') {
           delete attendanceData[monthKey][emp][day];
         } else {
           attendanceData[monthKey][emp][day] = status;
         }
       });
+
       saveStorage();
       renderTable();
       closeDayColumnModal();
+
+      const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      const statusLabel = status === 'EMPTY' ? 'Reset to Default' : (STATUS_MAP[status]?.name || status);
+      showToast(`Updated all employees to ${statusLabel} for ${monthNames[month]} ${day}`);
     }
 
     function handleCellClick(emp, year, month, day) {
+      const currentStatus = getEffectiveStatus(year, month, day, emp);
       activeCellTarget = { emp, year, month, day };
+
+      const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      const dObj = new Date(year, month, day);
+      const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+      const dayName = daysOfWeek[dObj.getDay()];
+      const statusTitle = STATUS_MAP[currentStatus]?.name || (currentStatus ? currentStatus : 'Cleared / Empty');
+
+      document.getElementById('modalEmpName').textContent = `${emp}`;
+      document.getElementById('modalDateInfo').textContent = `${dayName}, ${monthNames[month]} ${day}, ${year} (Current: ${statusTitle})`;
       document.getElementById('statusModal').classList.remove('hidden');
     }
 
@@ -685,64 +1417,420 @@
       if (!activeCellTarget) return;
       const { emp, year, month, day } = activeCellTarget;
       const monthKey = getMonthKey(year, month);
-      const isWeekend = (new Date(year, month, day).getDay() % 6 === 0);
+      const dow = new Date(year, month, day).getDay();
+      const isWeekend = (dow === 0 || dow === 6);
 
       if (!attendanceData[monthKey]) attendanceData[monthKey] = {};
       if (!attendanceData[monthKey][emp]) attendanceData[monthKey][emp] = {};
 
-      if (status === 'EMPTY') attendanceData[monthKey][emp][day] = 'EMPTY';
-      else if (!isWeekend && status === 'P') delete attendanceData[monthKey][emp][day];
-      else if (isWeekend && status === 'WO') delete attendanceData[monthKey][emp][day];
-      else attendanceData[monthKey][emp][day] = status;
+      if (status === 'EMPTY') {
+        attendanceData[monthKey][emp][day] = 'EMPTY';
+      } else if (!isWeekend && status === 'P') {
+        delete attendanceData[monthKey][emp][day];
+      } else if (isWeekend && status === 'WO') {
+        delete attendanceData[monthKey][emp][day];
+      } else {
+        attendanceData[monthKey][emp][day] = status;
+      }
 
       saveStorage();
       renderTable();
       closeModal();
+      showToast(`${emp} Day ${day} updated to ${status === 'EMPTY' ? 'Cleared' : (STATUS_MAP[status]?.name || status)}`);
     }
 
-    function closeModal() { document.getElementById('statusModal').classList.add('hidden'); activeCellTarget = null; }
+    function closeModal() {
+      document.getElementById('statusModal').classList.add('hidden');
+      activeCellTarget = null;
+    }
+
+    function resetSpecificMonth(year, month) {
+      const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      const key = getMonthKey(year, month);
+      delete attendanceData[key];
+      saveStorage();
+      renderTable();
+      showToast(`Reset ${monthNames[month]} ${year} to default values.`);
+    }
 
     function exportStructuredCSV(scope) {
-      const rows = [['Employee', 'DateOfJoining', 'Year', 'Month', 'Day', 'Date', 'DayOfWeek', 'Status']];
+      const headers = ['Employee', 'DateOfJoining_DD_MM_YYYY', 'Year', 'Month', 'Day', 'Date', 'DayOfWeek', 'Status', 'StatusDescription'];
+      const rows = [headers.join(',')];
       const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-      
-      let cycleMonthsToExport = scope === 'year' ? getAnnualCycleMonths(selectedCycleStartYear) : [];
-      if (scope !== 'year') for(let y=2026; y<=2036; y++) for(let m=0; m<=11; m++) cycleMonthsToExport.push({year:y, month:m});
+      const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+      let cycleMonthsToExport = [];
+      if (scope === 'year') {
+        cycleMonthsToExport = getAnnualCycleMonths(selectedCycleStartYear);
+      } else {
+        for (let y = 2026; y <= 2036; y++) {
+          for (let m = 0; m <= 11; m++) {
+            cycleMonthsToExport.push({ year: y, month: m });
+          }
+        }
+      }
 
       cycleMonthsToExport.forEach(({ year, month }) => {
+        const daysInM = getDaysInMonth(year, month);
         employeeRoster.forEach(empObj => {
-          for (let d = 1; d <= getDaysInMonth(year, month); d++) {
-            const status = getEffectiveStatus(year, month, d, empObj.name);
-            rows.push([`"${empObj.name}"`, `"${formatToDDMMYYYY(empObj.doj)}"`, year, `"${monthNames[month]}"`, d, `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`, '', `"${status}"`]);
+          const emp = empObj.name;
+          const doj = formatToDDMMYYYY(empObj.doj);
+          for (let d = 1; d <= daysInM; d++) {
+            const status = getEffectiveStatus(year, month, d, emp);
+            const dObj = new Date(year, month, d);
+            const dayStr = String(d).padStart(2, '0');
+            const mStr = String(month + 1).padStart(2, '0');
+            const dateIso = `${year}-${mStr}-${dayStr}`;
+            const dow = dayNames[dObj.getDay()];
+            const desc = STATUS_MAP[status]?.name || (status ? status : 'Clear');
+
+            rows.push([
+              `"${emp}"`,
+              `"${doj}"`,
+              year,
+              `"${monthNames[month]}"`,
+              d,
+              dateIso,
+              dow,
+              `"${status}"`,
+              `"${desc}"`
+            ].join(','));
           }
         });
       });
-      const blob = new Blob([rows.map(r => r.join(',')).join('\n')], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = 'export.csv';
-      link.click();
+
+      const filename = (scope === 'year')
+        ? `Attendance_AnnualCycle_Jun${selectedCycleStartYear}_May${selectedCycleStartYear + 1}.csv`
+        : `Attendance_All_Records_2026_2036.csv`;
+
+      downloadFile(rows.join('\n'), filename);
+      document.getElementById('exportMenu').classList.add('hidden');
+      showToast(`Exported CSV successfully!`);
     }
 
-    function openImportModal() { document.getElementById('importModal').classList.remove('hidden'); }
-    function closeImportModal() { document.getElementById('importModal').classList.add('hidden'); }
+    function downloadFile(content, fileName) {
+      const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", fileName);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function downloadSampleCSV() {
+      const sample = [
+        'Employee,Date,Status',
+        'Rakesh,2026-09-23,P',
+        'Rakesh,2026-09-24,P',
+        'Kuldeep,2026-09-23,BH',
+        'Kuldeep,2026-09-24,FH',
+        'Anil,2026-09-23,H',
+        'Karan,2026-09-23,LWP',
+        'Jagdish,2026-09-23,SH',
+        'Vinay,2026-09-23,P'
+      ].join('\n');
+
+      downloadFile(sample, 'attendance_sample_template.csv');
+      showToast("Downloaded sample CSV template.");
+    }
+
+    function parseCSVText(text) {
+      const lines = text.split(/\r?\n/).filter(line => line.trim().length > 0);
+      return lines.map(line => {
+        const row = [];
+        let inQuotes = false;
+        let token = '';
+
+        for (let i = 0; i < line.length; i++) {
+          const char = line[i];
+          if (char === '"') {
+            inQuotes = !inQuotes;
+          } else if (char === ',' && !inQuotes) {
+            row.push(token.trim().replace(/^"|"$/g, ''));
+            token = '';
+          } else {
+            token += char;
+          }
+        }
+        row.push(token.trim().replace(/^"|"$/g, ''));
+        return row;
+      });
+    }
+
+    function processUploadedCSV(csvContent, shouldOverwrite) {
+      const rows = parseCSVText(csvContent);
+      if (!rows || rows.length < 2) {
+        showToast("CSV file is empty or missing headers.");
+        return;
+      }
+
+      const headerRow = rows[0].map(h => h.trim().toLowerCase());
+      let updatedCount = 0;
+      let skippedCount = 0;
+      const validCodes = ['P', 'WO', 'BH', 'H', 'A', 'FH', 'SH', 'LWP', ''];
+
+      const empIndex = headerRow.findIndex(h => h.includes('emp'));
+      const dateIndex = headerRow.findIndex(h => h === 'date');
+      const statusIndex = headerRow.findIndex(h => h === 'status');
+      const dayIndex = headerRow.findIndex(h => h === 'day');
+      const monthIndex = headerRow.findIndex(h => h === 'month');
+      const yearIndex = headerRow.findIndex(h => h === 'year');
+
+      if (dateIndex !== -1 && statusIndex !== -1 && empIndex !== -1) {
+        for (let r = 1; r < rows.length; r++) {
+          const row = rows[r];
+          const rawEmp = row[empIndex];
+          const matchedEmp = findMatchingEmployee(rawEmp);
+          const rawDate = row[dateIndex]?.trim();
+          let rawStatus = (row[statusIndex] || '').trim().toUpperCase();
+          if (rawStatus === 'A') rawStatus = 'H';
+
+          if (!matchedEmp || !rawDate) {
+            skippedCount++;
+            continue;
+          }
+
+          const dParts = rawDate.split(/[-/]/);
+          if (dParts.length !== 3) {
+            skippedCount++;
+            continue;
+          }
+
+          const y = parseInt(dParts[0], 10);
+          const m = parseInt(dParts[1], 10) - 1;
+          const d = parseInt(dParts[2], 10);
+
+          if (isNaN(y) || isNaN(m) || isNaN(d) || y < 2026 || y > 2036 || m < 0 || m > 11 || d < 1 || d > 31) {
+            skippedCount++;
+            continue;
+          }
+
+          if (validCodes.includes(rawStatus)) {
+            const mKey = getMonthKey(y, m);
+            if (!attendanceData[mKey]) attendanceData[mKey] = {};
+            if (!attendanceData[mKey][matchedEmp]) attendanceData[mKey][matchedEmp] = {};
+
+            const dow = new Date(y, m, d).getDay();
+            const isWeekend = (dow === 0 || dow === 6);
+
+            if (rawStatus) {
+              attendanceData[mKey][matchedEmp][d] = rawStatus;
+              updatedCount++;
+            } else if (shouldOverwrite) {
+              if (isWeekend) {
+                attendanceData[mKey][matchedEmp][d] = 'EMPTY';
+              } else {
+                delete attendanceData[mKey][matchedEmp][d];
+              }
+              updatedCount++;
+            }
+          }
+        }
+      } else if (yearIndex !== -1 && monthIndex !== -1 && dayIndex !== -1 && statusIndex !== -1 && empIndex !== -1) {
+        for (let r = 1; r < rows.length; r++) {
+          const row = rows[r];
+          const matchedEmp = findMatchingEmployee(row[empIndex]);
+          const y = parseInt(row[yearIndex], 10);
+          let rawM = row[monthIndex]?.trim();
+          let m = parseInt(rawM, 10);
+
+          if (isNaN(m)) {
+            const monthNames = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
+            const foundIdx = monthNames.findIndex(mn => mn.startsWith(rawM.toLowerCase().slice(0, 3)));
+            if (foundIdx !== -1) m = foundIdx;
+          } else {
+            m = m - 1;
+          }
+
+          const d = parseInt(row[dayIndex], 10);
+          let rawStatus = (row[statusIndex] || '').trim().toUpperCase();
+          if (rawStatus === 'A') rawStatus = 'H';
+
+          if (!matchedEmp || isNaN(y) || isNaN(m) || isNaN(d) || y < 2026 || y > 2036 || m < 0 || m > 11 || d < 1 || d > 31) {
+            skippedCount++;
+            continue;
+          }
+
+          if (validCodes.includes(rawStatus)) {
+            const mKey = getMonthKey(y, m);
+            if (!attendanceData[mKey]) attendanceData[mKey] = {};
+            if (!attendanceData[mKey][matchedEmp]) attendanceData[mKey][matchedEmp] = {};
+
+            const dow = new Date(y, m, d).getDay();
+            const isWeekend = (dow === 0 || dow === 6);
+
+            if (rawStatus) {
+              attendanceData[mKey][matchedEmp][d] = rawStatus;
+              updatedCount++;
+            } else if (shouldOverwrite) {
+              if (isWeekend) {
+                attendanceData[mKey][matchedEmp][d] = 'EMPTY';
+              } else {
+                delete attendanceData[mKey][matchedEmp][d];
+              }
+              updatedCount++;
+            }
+          }
+        }
+      } else {
+        showToast("CSV columns not recognized. Use the sample template format.");
+        return;
+      }
+
+      saveStorage();
+      renderTable();
+      closeImportModal();
+      showToast(`Import completed! ${updatedCount} entries updated (${skippedCount} skipped).`);
+    }
+
+    function openImportModal() {
+      document.getElementById('importModal').classList.remove('hidden');
+      document.getElementById('csvFileInput').value = '';
+      document.getElementById('selectedFileName').textContent = 'Click to choose or drag & drop CSV file';
+    }
+
+    function closeImportModal() {
+      document.getElementById('importModal').classList.add('hidden');
+    }
 
     function showToast(msg) {
       const toast = document.getElementById('toast');
       document.getElementById('toastMsg').textContent = msg;
       toast.classList.remove('opacity-0', 'translate-y-3', 'pointer-events-none');
-      setTimeout(() => toast.classList.add('opacity-0', 'translate-y-3', 'pointer-events-none'), 3200);
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-3', 'pointer-events-none');
+      }, 3200);
     }
+
+    window.addEventListener('resize', updateStickyMeasurements);
 
     document.addEventListener('DOMContentLoaded', () => {
       loadStorage();
-      document.getElementById('mainCycleSelect')?.addEventListener('change', (e) => {
-        selectedCycleStartYear = parseInt(e.target.value, 10);
-        renderTable();
+      updateStickyMeasurements();
+
+      const mainCycleSelect = document.getElementById('mainCycleSelect');
+      const goToTodayBtn = document.getElementById('goToTodayBtn');
+      const tabAnnualBtn = document.getElementById('tabAnnualBtn');
+      const monthlyView = document.getElementById('monthlyView');
+      const annualView = document.getElementById('annualView');
+      const closeModalBtn = document.getElementById('closeModalBtn');
+      const exportMenuBtn = document.getElementById('exportMenuBtn');
+      const exportMenu = document.getElementById('exportMenu');
+      const openImportModalBtn = document.getElementById('openImportModalBtn');
+      const closeImportModalBtn = document.getElementById('closeImportModalBtn');
+      const csvFileInput = document.getElementById('csvFileInput');
+      const processImportBtn = document.getElementById('processImportBtn');
+      const selectedFileName = document.getElementById('selectedFileName');
+      const annualCycleSelect = document.getElementById('annualCycleSelect');
+
+      if (mainCycleSelect) {
+        mainCycleSelect.value = selectedCycleStartYear;
+        mainCycleSelect.addEventListener('change', (e) => {
+          selectedCycleStartYear = parseInt(e.target.value, 10);
+          if (annualCycleSelect) annualCycleSelect.value = selectedCycleStartYear;
+          renderTable();
+        });
+      }
+
+      if (annualCycleSelect) {
+        annualCycleSelect.addEventListener('change', (e) => {
+          selectedCycleStartYear = parseInt(e.target.value, 10);
+          if (mainCycleSelect) mainCycleSelect.value = selectedCycleStartYear;
+          renderTable();
+          renderAnnualOverview();
+        });
+      }
+
+      goToTodayBtn.addEventListener('click', () => {
+        if (annualView && !annualView.classList.contains('hidden')) {
+          annualView.classList.add('hidden');
+          monthlyView.classList.remove('hidden');
+          tabAnnualBtn.className = "px-3 py-1 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition";
+        }
+        const currentMKey = `${realTodayYear}-${realTodayMonth}`;
+        const targetSection = document.getElementById(`month-section-${currentMKey}`);
+        if (targetSection) {
+          targetSection.scrollIntoView({ behavior: 'smooth' });
+          showToast(`Navigated to ${realToday.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`);
+        } else {
+          showToast(`Current month is outside the active annual cycle (${selectedCycleStartYear}-${selectedCycleStartYear + 1}).`);
+        }
       });
-      document.getElementById('tabAnnualBtn').addEventListener('click', () => {
-        document.getElementById('annualView').classList.toggle('hidden');
-        document.getElementById('monthlyView').classList.toggle('hidden');
-        renderAnnualOverview();
+
+      tabAnnualBtn.addEventListener('click', () => {
+        const isAnnualOpen = !annualView.classList.contains('hidden');
+        if (isAnnualOpen) {
+          annualView.classList.add('hidden');
+          monthlyView.classList.remove('hidden');
+          tabAnnualBtn.className = "px-3 py-1 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition";
+        } else {
+          annualView.classList.remove('hidden');
+          monthlyView.classList.add('hidden');
+          renderAnnualOverview();
+          tabAnnualBtn.className = "px-3 py-1 text-xs font-semibold rounded-lg bg-indigo-600 text-white shadow-xs transition";
+        }
       });
+
+      closeModalBtn.addEventListener('click', closeModal);
+      document.getElementById('statusModal').addEventListener('click', (e) => {
+        if (e.target.id === 'statusModal') closeModal();
+      });
+
+      document.getElementById('dayColumnModal').addEventListener('click', (e) => {
+        if (e.target.id === 'dayColumnModal') closeDayColumnModal();
+      });
+
+      document.getElementById('employeeModal').addEventListener('click', (e) => {
+        if (e.target.id === 'employeeModal') closeEmployeeModal();
+      });
+
+      exportMenuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        exportMenu.classList.toggle('hidden');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!exportMenu.contains(e.target) && e.target !== exportMenuBtn) {
+          exportMenu.classList.add('hidden');
+        }
+      });
+
+      openImportModalBtn.addEventListener('click', openImportModal);
+      closeImportModalBtn.addEventListener('click', closeImportModal);
+      document.getElementById('importModal').addEventListener('click', (e) => {
+        if (e.target.id === 'importModal') closeImportModal();
+      });
+
+      csvFileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          selectedFileName.textContent = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+        }
+      });
+
+      processImportBtn.addEventListener('click', () => {
+        const file = csvFileInput.files[0];
+        if (!file) {
+          showToast("Please choose a CSV file first.");
+          return;
+        }
+
+        const shouldOverwrite = document.getElementById('overwriteOption').checked;
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          const content = evt.target.result;
+          processUploadedCSV(content, shouldOverwrite);
+        };
+        reader.onerror = function() {
+          showToast("Failed to read CSV file.");
+        };
+        reader.readAsText(file);
+      });
+
+      renderTable();
     });
   </script>
 </body>
