@@ -115,26 +115,6 @@
             <i class="fa-solid fa-chart-pie mr-1 text-slate-500"></i> Annual Overview
           </button>
 
-          <button id="openImportModalBtn" class="px-3 py-1 text-xs font-semibold rounded-lg border border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition shadow-2xs flex items-center gap-1.5" title="Import Attendance CSV">
-            <i class="fa-solid fa-file-import text-indigo-600"></i> Import CSV
-          </button>
-
-          <div class="relative inline-block" id="exportDropdownContainer">
-            <button id="exportMenuBtn" class="px-3 py-1 text-xs font-semibold rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 transition shadow-2xs flex items-center gap-1.5">
-              <i class="fa-solid fa-file-csv text-emerald-600"></i> Export CSV <i class="fa-solid fa-caret-down text-[10px]"></i>
-            </button>
-            
-            <div id="exportMenu" class="hidden absolute right-0 mt-1 w-56 bg-white border border-slate-200 rounded-xl shadow-xl z-50 p-2 text-xs space-y-1">
-              <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-2 py-1">Export Options</div>
-              <button onclick="exportStructuredCSV('year')" class="w-full text-left px-2 py-1.5 rounded-lg hover:bg-slate-100 font-medium text-slate-700 flex items-center gap-2">
-                <i class="fa-solid fa-calendar-days text-indigo-600"></i> Detailed Rows (Annual Cycle)
-              </button>
-              <button onclick="exportStructuredCSV('all')" class="w-full text-left px-2 py-1.5 rounded-lg hover:bg-slate-100 font-medium text-slate-700 flex items-center gap-2">
-                <i class="fa-solid fa-database text-purple-600"></i> All Records (All Years)
-              </button>
-            </div>
-          </div>
-
           <button id="saveDataBtn" onclick="handleSync()" class="px-3.5 py-1 text-xs font-bold rounded-lg bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white shadow-xs transition flex items-center gap-1.5" title="Sync data to Google Sheets">
             <i class="fa-solid fa-cloud-arrow-up text-emerald-200 text-sm"></i>
             <span>Sync</span>
@@ -379,70 +359,6 @@
     </div>
   </div>
 
-  <!-- CSV Import Modal Dialog -->
-  <div id="importModal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-2xs z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-lg w-full p-6 space-y-4">
-      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-        <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-sm">
-            <i class="fa-solid fa-file-import"></i>
-          </div>
-          <div>
-            <h3 class="font-bold text-sm text-slate-900">Import Attendance CSV</h3>
-            <p class="text-xs text-slate-500">Update or populate calendar records from file</p>
-          </div>
-        </div>
-        <button id="closeImportModalBtn" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
-          <i class="fa-solid fa-xmark text-base"></i>
-        </button>
-      </div>
-
-      <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs text-slate-600 space-y-2">
-        <div class="font-bold text-slate-700 flex items-center gap-1">
-          <i class="fa-solid fa-circle-info text-indigo-500"></i> Supported Formats:
-        </div>
-        <ul class="list-disc list-inside space-y-1 text-[11px] text-slate-600">
-          <li><b>Standard Detailed CSV:</b> <code class="bg-slate-200 px-1 py-0.5 rounded text-indigo-700">Employee, Date (YYYY-MM-DD), Status</code></li>
-          <li><b>Split Columns CSV:</b> <code class="bg-slate-200 px-1 py-0.5 rounded text-indigo-700">Employee, Year, Month, Day, Status</code></li>
-          <li><b>Monthly Grid CSV:</b> Exported directly from this sheet with Day 1...Day 31 headers.</li>
-          <li>Valid statuses: <span class="font-bold">P, WO, BH, H (or A), FH, SH, LWP</span> (or empty to clear).</li>
-        </ul>
-        <div class="pt-1 flex items-center justify-between">
-          <span class="text-[11px] text-slate-500">Need a starting structure?</span>
-          <button onclick="downloadSampleCSV()" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
-            <i class="fa-solid fa-download"></i> Download Sample CSV Template
-          </button>
-        </div>
-      </div>
-
-      <div class="space-y-3">
-        <label class="block text-xs font-bold text-slate-700">Select CSV File:</label>
-        <div class="border-2 border-dashed border-slate-300 hover:border-indigo-400 bg-slate-50/50 hover:bg-indigo-50/20 rounded-xl p-5 text-center transition cursor-pointer" onclick="document.getElementById('csvFileInput').click()">
-          <input type="file" id="csvFileInput" accept=".csv,text/csv" class="hidden">
-          <div class="text-indigo-600 text-3xl mb-1"><i class="fa-solid fa-cloud-arrow-up"></i></div>
-          <div class="text-xs font-semibold text-slate-700" id="selectedFileName">Click to choose or drag &amp; drop CSV file</div>
-          <div class="text-[10px] text-slate-400 mt-1">.csv format only &bull; max 5MB</div>
-        </div>
-
-        <div class="flex items-center gap-2">
-          <input type="checkbox" id="overwriteOption" class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer">
-          <label for="overwriteOption" class="text-xs text-slate-600 cursor-pointer">
-            Cleanly overwrite existing values for imported dates (checked) or merge alongside existing.
-          </label>
-        </div>
-      </div>
-
-      <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
-        <button onclick="closeImportModal()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-lg font-medium transition">
-          Cancel
-        </button>
-        <button id="processImportBtn" class="text-xs bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-lg shadow-sm transition flex items-center gap-1.5">
-          <i class="fa-solid fa-file-arrow-up"></i> Parse &amp; Apply to Calendar
-        </button>
-      </div>
-    </div>
-  </div>
-
   <!-- Notification Toast -->
   <div id="toast" class="fixed bottom-4 right-4 bg-slate-900 text-white text-xs px-4 py-2.5 rounded-xl shadow-xl transition-all duration-300 opacity-0 pointer-events-none transform translate-y-3 z-50 flex items-center gap-2">
     <i class="fa-solid fa-circle-check text-emerald-400"></i>
@@ -595,7 +511,7 @@
     }
 
     function handleSync() {
-      saveStorage(); // Trigger cloud sync manually
+      saveStorage();
       
       const saveBtn = document.getElementById('saveDataBtn');
       if (saveBtn) {
@@ -665,14 +581,12 @@
       if (!clean) return 'Not Set';
       const parts = clean.split(/[-/]/);
       if (parts.length === 3) {
-        // Handle YYYY-MM-DD
         if (parts[0].length === 4) {
           const y = parts[0];
           const m = String(parts[1]).padStart(2, '0');
           const d = String(parts[2]).padStart(2, '0');
           return `${d}-${m}-${y}`;
         }
-        // Handle DD-MM-YYYY
         if (parts[2].length === 4) {
           const d = String(parts[0]).padStart(2, '0');
           const m = String(parts[1]).padStart(2, '0');
@@ -1453,249 +1367,6 @@
       showToast(`Reset ${monthNames[month]} ${year} to default values.`);
     }
 
-    function exportStructuredCSV(scope) {
-      const headers = ['Employee', 'DateOfJoining_DD_MM_YYYY', 'Year', 'Month', 'Day', 'Date', 'DayOfWeek', 'Status', 'StatusDescription'];
-      const rows = [headers.join(',')];
-      const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-      const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-
-      let cycleMonthsToExport = [];
-      if (scope === 'year') {
-        cycleMonthsToExport = getAnnualCycleMonths(selectedCycleStartYear);
-      } else {
-        for (let y = 2026; y <= 2036; y++) {
-          for (let m = 0; m <= 11; m++) {
-            cycleMonthsToExport.push({ year: y, month: m });
-          }
-        }
-      }
-
-      cycleMonthsToExport.forEach(({ year, month }) => {
-        const daysInM = getDaysInMonth(year, month);
-        employeeRoster.forEach(empObj => {
-          const emp = empObj.name;
-          const doj = formatToDDMMYYYY(empObj.doj);
-          for (let d = 1; d <= daysInM; d++) {
-            const status = getEffectiveStatus(year, month, d, emp);
-            const dObj = new Date(year, month, d);
-            const dayStr = String(d).padStart(2, '0');
-            const mStr = String(month + 1).padStart(2, '0');
-            const dateIso = `${year}-${mStr}-${dayStr}`;
-            const dow = dayNames[dObj.getDay()];
-            const desc = STATUS_MAP[status]?.name || (status ? status : 'Clear');
-
-            rows.push([
-              `"${emp}"`,
-              `"${doj}"`,
-              year,
-              `"${monthNames[month]}"`,
-              d,
-              dateIso,
-              dow,
-              `"${status}"`,
-              `"${desc}"`
-            ].join(','));
-          }
-        });
-      });
-
-      const filename = (scope === 'year')
-        ? `Attendance_AnnualCycle_Jun${selectedCycleStartYear}_May${selectedCycleStartYear + 1}.csv`
-        : `Attendance_All_Records_2026_2036.csv`;
-
-      downloadFile(rows.join('\n'), filename);
-      document.getElementById('exportMenu').classList.add('hidden');
-      showToast(`Exported CSV successfully!`);
-    }
-
-    function downloadFile(content, fileName) {
-      const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement("a");
-      const url = URL.createObjectURL(blob);
-      link.setAttribute("href", url);
-      link.setAttribute("download", fileName);
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-
-    function downloadSampleCSV() {
-      const sample = [
-        'Employee,Date,Status',
-        'Rakesh,2026-09-23,P',
-        'Rakesh,2026-09-24,P',
-        'Kuldeep,2026-09-23,BH',
-        'Kuldeep,2026-09-24,FH',
-        'Anil,2026-09-23,H',
-        'Karan,2026-09-23,LWP',
-        'Jagdish,2026-09-23,SH',
-        'Vinay,2026-09-23,P'
-      ].join('\n');
-
-      downloadFile(sample, 'attendance_sample_template.csv');
-      showToast("Downloaded sample CSV template.");
-    }
-
-    function parseCSVText(text) {
-      const lines = text.split(/\r?\n/).filter(line => line.trim().length > 0);
-      return lines.map(line => {
-        const row = [];
-        let inQuotes = false;
-        let token = '';
-
-        for (let i = 0; i < line.length; i++) {
-          const char = line[i];
-          if (char === '"') {
-            inQuotes = !inQuotes;
-          } else if (char === ',' && !inQuotes) {
-            row.push(token.trim().replace(/^"|"$/g, ''));
-            token = '';
-          } else {
-            token += char;
-          }
-        }
-        row.push(token.trim().replace(/^"|"$/g, ''));
-        return row;
-      });
-    }
-
-    function processUploadedCSV(csvContent, shouldOverwrite) {
-      const rows = parseCSVText(csvContent);
-      if (!rows || rows.length < 2) {
-        showToast("CSV file is empty or missing headers.");
-        return;
-      }
-
-      const headerRow = rows[0].map(h => h.trim().toLowerCase());
-      let updatedCount = 0;
-      let skippedCount = 0;
-      const validCodes = ['P', 'WO', 'BH', 'H', 'A', 'FH', 'SH', 'LWP', ''];
-
-      const empIndex = headerRow.findIndex(h => h.includes('emp'));
-      const dateIndex = headerRow.findIndex(h => h === 'date');
-      const statusIndex = headerRow.findIndex(h => h === 'status');
-      const dayIndex = headerRow.findIndex(h => h === 'day');
-      const monthIndex = headerRow.findIndex(h => h === 'month');
-      const yearIndex = headerRow.findIndex(h => h === 'year');
-
-      if (dateIndex !== -1 && statusIndex !== -1 && empIndex !== -1) {
-        for (let r = 1; r < rows.length; r++) {
-          const row = rows[r];
-          const rawEmp = row[empIndex];
-          const matchedEmp = findMatchingEmployee(rawEmp);
-          const rawDate = row[dateIndex]?.trim();
-          let rawStatus = (row[statusIndex] || '').trim().toUpperCase();
-          if (rawStatus === 'A') rawStatus = 'H';
-
-          if (!matchedEmp || !rawDate) {
-            skippedCount++;
-            continue;
-          }
-
-          const dParts = rawDate.split(/[-/]/);
-          if (dParts.length !== 3) {
-            skippedCount++;
-            continue;
-          }
-
-          const y = parseInt(dParts[0], 10);
-          const m = parseInt(dParts[1], 10) - 1;
-          const d = parseInt(dParts[2], 10);
-
-          if (isNaN(y) || isNaN(m) || isNaN(d) || y < 2026 || y > 2036 || m < 0 || m > 11 || d < 1 || d > 31) {
-            skippedCount++;
-            continue;
-          }
-
-          if (validCodes.includes(rawStatus)) {
-            const mKey = getMonthKey(y, m);
-            if (!attendanceData[mKey]) attendanceData[mKey] = {};
-            if (!attendanceData[mKey][matchedEmp]) attendanceData[mKey][matchedEmp] = {};
-
-            const dow = new Date(y, m, d).getDay();
-            const isWeekend = (dow === 0 || dow === 6);
-
-            if (rawStatus) {
-              attendanceData[mKey][matchedEmp][d] = rawStatus;
-              updatedCount++;
-            } else if (shouldOverwrite) {
-              if (isWeekend) {
-                attendanceData[mKey][matchedEmp][d] = 'EMPTY';
-              } else {
-                delete attendanceData[mKey][matchedEmp][d];
-              }
-              updatedCount++;
-            }
-          }
-        }
-      } else if (yearIndex !== -1 && monthIndex !== -1 && dayIndex !== -1 && statusIndex !== -1 && empIndex !== -1) {
-        for (let r = 1; r < rows.length; r++) {
-          const row = rows[r];
-          const matchedEmp = findMatchingEmployee(row[empIndex]);
-          const y = parseInt(row[yearIndex], 10);
-          let rawM = row[monthIndex]?.trim();
-          let m = parseInt(rawM, 10);
-
-          if (isNaN(m)) {
-            const monthNames = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
-            const foundIdx = monthNames.findIndex(mn => mn.startsWith(rawM.toLowerCase().slice(0, 3)));
-            if (foundIdx !== -1) m = foundIdx;
-          } else {
-            m = m - 1;
-          }
-
-          const d = parseInt(row[dayIndex], 10);
-          let rawStatus = (row[statusIndex] || '').trim().toUpperCase();
-          if (rawStatus === 'A') rawStatus = 'H';
-
-          if (!matchedEmp || isNaN(y) || isNaN(m) || isNaN(d) || y < 2026 || y > 2036 || m < 0 || m > 11 || d < 1 || d > 31) {
-            skippedCount++;
-            continue;
-          }
-
-          if (validCodes.includes(rawStatus)) {
-            const mKey = getMonthKey(y, m);
-            if (!attendanceData[mKey]) attendanceData[mKey] = {};
-            if (!attendanceData[mKey][matchedEmp]) attendanceData[mKey][matchedEmp] = {};
-
-            const dow = new Date(y, m, d).getDay();
-            const isWeekend = (dow === 0 || dow === 6);
-
-            if (rawStatus) {
-              attendanceData[mKey][matchedEmp][d] = rawStatus;
-              updatedCount++;
-            } else if (shouldOverwrite) {
-              if (isWeekend) {
-                attendanceData[mKey][matchedEmp][d] = 'EMPTY';
-              } else {
-                delete attendanceData[mKey][matchedEmp][d];
-              }
-              updatedCount++;
-            }
-          }
-        }
-      } else {
-        showToast("CSV columns not recognized. Use the sample template format.");
-        return;
-      }
-
-      saveStorage();
-      renderTable();
-      closeImportModal();
-      showToast(`Import completed! ${updatedCount} entries updated (${skippedCount} skipped).`);
-    }
-
-    function openImportModal() {
-      document.getElementById('importModal').classList.remove('hidden');
-      document.getElementById('csvFileInput').value = '';
-      document.getElementById('selectedFileName').textContent = 'Click to choose or drag & drop CSV file';
-    }
-
-    function closeImportModal() {
-      document.getElementById('importModal').classList.add('hidden');
-    }
-
     function showToast(msg) {
       const toast = document.getElementById('toast');
       document.getElementById('toastMsg').textContent = msg;
@@ -1717,13 +1388,6 @@
       const monthlyView = document.getElementById('monthlyView');
       const annualView = document.getElementById('annualView');
       const closeModalBtn = document.getElementById('closeModalBtn');
-      const exportMenuBtn = document.getElementById('exportMenuBtn');
-      const exportMenu = document.getElementById('exportMenu');
-      const openImportModalBtn = document.getElementById('openImportModalBtn');
-      const closeImportModalBtn = document.getElementById('closeImportModalBtn');
-      const csvFileInput = document.getElementById('csvFileInput');
-      const processImportBtn = document.getElementById('processImportBtn');
-      const selectedFileName = document.getElementById('selectedFileName');
       const annualCycleSelect = document.getElementById('annualCycleSelect');
 
       if (mainCycleSelect) {
@@ -1785,49 +1449,6 @@
 
       document.getElementById('employeeModal').addEventListener('click', (e) => {
         if (e.target.id === 'employeeModal') closeEmployeeModal();
-      });
-
-      exportMenuBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        exportMenu.classList.toggle('hidden');
-      });
-
-      document.addEventListener('click', (e) => {
-        if (!exportMenu.contains(e.target) && e.target !== exportMenuBtn) {
-          exportMenu.classList.add('hidden');
-        }
-      });
-
-      openImportModalBtn.addEventListener('click', openImportModal);
-      closeImportModalBtn.addEventListener('click', closeImportModal);
-      document.getElementById('importModal').addEventListener('click', (e) => {
-        if (e.target.id === 'importModal') closeImportModal();
-      });
-
-      csvFileInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) {
-          selectedFileName.textContent = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
-        }
-      });
-
-      processImportBtn.addEventListener('click', () => {
-        const file = csvFileInput.files[0];
-        if (!file) {
-          showToast("Please choose a CSV file first.");
-          return;
-        }
-
-        const shouldOverwrite = document.getElementById('overwriteOption').checked;
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-          const content = evt.target.result;
-          processUploadedCSV(content, shouldOverwrite);
-        };
-        reader.onerror = function() {
-          showToast("Failed to read CSV file.");
-        };
-        reader.readAsText(file);
       });
 
       renderTable();
