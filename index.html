@@ -563,11 +563,16 @@
         if(syncStatus) syncStatus.innerHTML = '<i class="fa-solid fa-arrows-rotate fa-spin text-indigo-500"></i> Syncing...';
         
         await fetch(GOOGLE_APP_SCRIPT_URL, {
-          method: 'POST',
-          body: JSON.stringify({
-            attendance: attendanceData,
-            employees: employeeRoster
-          }),
+      method: 'POST',
+      body: JSON.stringify({
+        attendance: attendanceData,
+        employees: employeeRoster
+      }),
+      redirect: 'follow', // <-- Changed this line
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8',
+      }
+    });
           // no-cors is needed for Apps Script POST requests from static sites to prevent CORS blocking
           mode: 'no-cors', 
           headers: {
