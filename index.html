@@ -132,16 +132,12 @@
               <button onclick="exportStructuredCSV('all')" class="w-full text-left px-2 py-1.5 rounded-lg hover:bg-slate-100 font-medium text-slate-700 flex items-center gap-2">
                 <i class="fa-solid fa-database text-purple-600"></i> All Records (All Years)
               </button>
-              <div class="border-t border-slate-100 my-1"></div>
-              <button onclick="downloadUpdatedHTML()" class="w-full text-left px-2 py-1.5 rounded-lg hover:bg-slate-100 font-medium text-emerald-700 flex items-center gap-2" title="Download standalone HTML backup">
-                <i class="fa-solid fa-file-code text-emerald-600"></i> Backup as HTML File
-              </button>
             </div>
           </div>
 
-          <button id="saveDataBtn" onclick="handleExplicitSave()" class="px-3.5 py-1 text-xs font-bold rounded-lg bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white shadow-xs transition flex items-center gap-1.5" title="Force Sync and backup HTML">
+          <button id="saveDataBtn" onclick="handleSync()" class="px-3.5 py-1 text-xs font-bold rounded-lg bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white shadow-xs transition flex items-center gap-1.5" title="Sync data to Google Sheets">
             <i class="fa-solid fa-cloud-arrow-up text-emerald-200 text-sm"></i>
-            <span>Force Sync Data</span>
+            <span>Sync</span>
           </button>
         </div>
       </div>
@@ -605,14 +601,13 @@
       });
     }
 
-    function handleExplicitSave() {
+    function handleSync() {
       saveStorage(); // Trigger cloud sync manually
-      downloadUpdatedHTML(); // Kept for users wanting manual file backups
       
       const saveBtn = document.getElementById('saveDataBtn');
       if (saveBtn) {
         const originalContent = saveBtn.innerHTML;
-        saveBtn.innerHTML = `<i class="fa-solid fa-check text-emerald-200 text-sm"></i><span>Synced & Saved!</span>`;
+        saveBtn.innerHTML = `<i class="fa-solid fa-check text-emerald-200 text-sm"></i><span>Synced!</span>`;
         saveBtn.classList.remove('bg-emerald-600', 'hover:bg-emerald-700');
         saveBtn.classList.add('bg-emerald-800');
         setTimeout(() => {
@@ -624,27 +619,7 @@
       
       const now = new Date();
       const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      showToast(`Data synced to cloud & HTML backup downloaded at ${timeStr}!`);
-    }
-
-    function downloadUpdatedHTML() {
-      let fullHtml = document.documentElement.outerHTML;
-      const embeddedScript = `<script id="embedded-data">\n    window.__EMBEDDED_ATTENDANCE__ = ${JSON.stringify(attendanceData, null, 2)};\n    window.__EMBEDDED_EMPLOYEES__ = ${JSON.stringify(employeeRoster, null, 2)};\n  <\/script>`;
-
-      if (fullHtml.includes('id="embedded-data"')) {
-        fullHtml = fullHtml.replace(/<script id="embedded-data">[\s\S]*?<\/script>/, embeddedScript);
-      } else {
-        fullHtml = fullHtml.replace('</head>', `${embeddedScript}\n</head>`);
-      }
-
-      const blob = new Blob([fullHtml], { type: 'text/html;charset=utf-8;' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = `SKRUPAM_Attendance_Cycle_${selectedCycleStartYear}_${selectedCycleStartYear + 1}.html`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(link.href);
+      showToast(`Data successfully synced to Google Sheets at ${timeStr}!`);
     }
 
     function getMonthKey(y, m) {
