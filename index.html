@@ -191,8 +191,8 @@
             </div>
             <p class="text-xs text-slate-500 mt-1">Company Annual Cycle: <b>1st June to 31st May</b> &bull; Total Leaves strictly excludes Week Offs &amp; Bank Holidays</p>
           </div>
-          <div class="text-xs text-rose-800 bg-rose-50 px-3 py-1.5 rounded-lg border border-rose-200 font-medium">
-            <i class="fa-solid fa-calculator mr-1"></i> Total Holidays / Leaves = Holiday (H) + LWP + Half-Days (0.5)
+          <div class="text-xs text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200 font-medium">
+            <i class="fa-solid fa-calculator mr-1"></i> Remaining Leaves = Allotted - (Holiday + Half-Days). <span class="font-bold text-rose-600">LWP is NOT deducted.</span>
           </div>
         </div>
 
@@ -206,10 +206,10 @@
                 <th class="py-3 px-3 text-center text-sky-700 font-bold bg-sky-50/70" title="Informational only">Week Offs (WO)</th>
                 <th class="py-3 px-3 text-center text-purple-700 font-bold bg-purple-50/70" title="Informational only">Bank Holidays (BH)</th>
                 <th class="py-3 px-3 text-center text-rose-600 font-semibold">Holiday (H)</th>
-                <th class="py-3 px-3 text-center text-red-600 font-semibold">LWP</th>
+                <th class="py-3 px-3 text-center text-red-600 font-semibold" title="Leave Without Pay (Not deducted from allotted)">LWP</th>
                 <th class="py-3 px-3 text-center text-amber-600 font-semibold">Half Days (FH+SH)</th>
-                <th class="py-3 px-3 text-center font-extrabold text-rose-900 bg-rose-100" title="Holiday + LWP + (Half * 0.5)">Total Holidays / Leaves</th>
-                <th class="py-3 px-3 text-center font-extrabold text-emerald-900 bg-emerald-100 border-l border-slate-200">Remaining Leaves</th>
+                <th class="py-3 px-3 text-center font-extrabold text-rose-900 bg-rose-100" title="Holiday + LWP + (Half * 0.5)">Total Taken (Inc. LWP)</th>
+                <th class="py-3 px-3 text-center font-extrabold text-emerald-900 bg-emerald-100 border-l border-slate-200" title="Allotted Leaves - (Holiday + Half * 0.5)">Remaining Leaves</th>
               </tr>
             </thead>
             <tbody id="annualSummaryBody" class="divide-y divide-slate-200">
@@ -1065,7 +1065,10 @@
 
         const annualLeaves = totalHoliday + totalLWP + (totalHalf * 0.5);
         const allotted = empObj.allottedLeaves || 0;
-        const remaining = allotted - annualLeaves;
+        
+        // NEW RULE: LWP is not deducted from allotted leaves
+        const paidLeavesTaken = totalHoliday + (totalHalf * 0.5);
+        const remaining = allotted - paidLeavesTaken;
 
         annualData.push({
           emp,
@@ -1128,7 +1131,7 @@
       doc.setFontSize(7);
       doc.setTextColor(100, 116, 139);
       doc.setFont("helvetica", "normal");
-      doc.text("* Note: Total Leaves Taken formula strictly = Holiday + LWP + (Half x 0.5). Remaining Leaves = Allotted Leaves - Total Leaves Taken.", 28, finalY);
+      doc.text("* Note: Total Taken = Holiday + LWP + (Half x 0.5). Remaining Leaves = Allotted - (Holiday + Half x 0.5). LWP is excluded from remaining deduction.", 28, finalY);
       doc.text("Authorized Signatory: ____________________________", pageWidth - 28, finalY, { align: 'right' });
 
       doc.save(`SKRUPAM_Attendance_Report_${monthNames[month]}_${year}.pdf`);
@@ -1345,7 +1348,10 @@
 
         const totalHolidaysAndLeaves = totalHoliday + totalLWP + (totalHalf * 0.5);
         const allotted = parseFloat(empObj.allottedLeaves) || 0;
-        const remaining = allotted - totalHolidaysAndLeaves;
+        
+        // NEW RULE: LWP is not deducted from allotted leaves
+        const paidLeavesTaken = totalHoliday + (totalHalf * 0.5);
+        const remaining = allotted - paidLeavesTaken;
         
         const remainingClass = remaining < 0 ? 'text-red-600 bg-red-50' : 'text-emerald-700 bg-emerald-50';
 
@@ -1367,7 +1373,7 @@
             <td class="py-3 px-3 text-center font-extrabold text-rose-900 bg-rose-100 border-l border-slate-200 text-sm">
               ${totalHolidaysAndLeaves}
             </td>
-            <td class="py-3 px-3 text-center font-extrabold ${remainingClass} text-sm">
+            <td class="py-3 px-3 text-center font-extrabold ${remainingClass} text-sm" title="Allotted Leaves - (Holiday + Half * 0.5)">
               ${remaining}
             </td>
           </tr>`;
