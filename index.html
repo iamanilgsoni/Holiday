@@ -68,37 +68,10 @@
     }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col font-sans" id="mainBody">
-
-  <!-- ================= ADMIN LOGIN MODAL ================= -->
-  <div id="adminAuthModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 transition-opacity duration-300">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center space-y-5">
-      <div class="flex justify-between items-center mb-2">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl shadow-sm">
-            <i class="fa-solid fa-lock"></i>
-          </div>
-          <h2 class="text-lg font-bold text-slate-900 text-left">Admin Login</h2>
-        </div>
-        <button onclick="closeAdminLogin()" class="text-slate-400 hover:text-slate-600 p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
-      </div>
-      
-      <p class="text-xs text-slate-500 text-left">Enter the admin password to unlock editing, syncing, and employee management.</p>
-
-      <div class="space-y-3 text-left pt-2">
-        <input type="password" id="adminPassword" placeholder="Enter password..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" onkeypress="if(event.key === 'Enter') attemptAdminLogin()">
-        
-        <button onclick="attemptAdminLogin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-5 py-2.5 rounded-xl transition shadow-md flex items-center justify-center gap-2">
-          <i class="fa-solid fa-unlock-keyhole"></i> Unlock Editing
-        </button>
-        <p class="text-[10px] text-slate-400 text-center">Hint: The default password is <b>admin123</b></p>
-      </div>
-    </div>
-  </div>
-  <!-- ================= /ADMIN LOGIN MODAL ================= -->
+<body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col font-sans">
 
   <!-- Unified Sticky Top Bar -->
-  <div id="topStickyHeader" class="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-sm transition-all duration-300">
+  <div id="topStickyHeader" class="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-sm">
     <header class="border-b border-slate-100 bg-white">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 py-2 flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center space-x-3">
@@ -107,93 +80,108 @@
           </div>
           <div>
             <h1 class="text-sm sm:text-base font-bold text-slate-900 leading-tight">SKRUPAM ENTERPRISES</h1>
-            <div class="flex items-center gap-2">
-              <p class="text-[11px] text-slate-500 hidden sm:block">Employee Attendance &amp; Leave Tracker</p>
-              <!-- Role Badge -->
-              <span id="roleDisplayBadge" class="text-[9px] px-1.5 py-0.5 rounded font-bold bg-sky-50 text-sky-700 border border-sky-200 tracking-wide">
-                <i class="fa-regular fa-eye mr-0.5"></i> VIEWER
-              </span>
-            </div>
+            <p class="text-[11px] text-slate-500">Employee Attendance &amp; Leave Tracker</p>
           </div>
         </div>
 
         <div class="flex flex-wrap items-center gap-2">
-          <!-- Cycle Range Selector -->
-          <div class="inline-flex items-center rounded-lg border border-indigo-200 bg-indigo-50/50 px-2.5 py-1 shadow-2xs gap-1.5 hidden sm:inline-flex">
+          <!-- Cycle Range Selector (June to May) -->
+          <div class="inline-flex items-center rounded-lg border border-indigo-200 bg-indigo-50/50 px-2.5 py-1 shadow-2xs gap-1.5">
             <span class="text-xs font-semibold text-indigo-900"><i class="fa-solid fa-calendar-days text-indigo-600 mr-1"></i>Cycle:</span>
             <select id="mainCycleSelect" class="bg-transparent text-xs font-bold text-indigo-700 focus:outline-none cursor-pointer">
               <option value="2026">Jun 2026 – May 2027</option>
               <option value="2027">Jun 2027 – May 2028</option>
               <option value="2028">Jun 2028 – May 2029</option>
               <option value="2029">Jun 2029 – May 2030</option>
+              <option value="2030">Jun 2030 – May 2031</option>
+              <option value="2031">Jun 2031 – May 2032</option>
+              <option value="2032">Jun 2032 – May 2033</option>
+              <option value="2033">Jun 2033 – May 2034</option>
+              <option value="2034">Jun 2034 – May 2035</option>
+              <option value="2035">Jun 2035 – May 2036</option>
             </select>
           </div>
 
-          <button id="goToTodayBtn" class="px-3 py-1 text-xs font-medium rounded-lg text-indigo-700 hover:bg-indigo-50 border border-indigo-200 transition flex items-center gap-1.5 hidden sm:flex" title="Jump to current month">
-            <i class="fa-solid fa-calendar-day text-indigo-600"></i> Current Month
+          <button id="goToTodayBtn" class="px-3 py-1 text-xs font-medium rounded-lg text-indigo-700 hover:bg-indigo-50 border border-indigo-200 transition flex items-center gap-1.5" title="Jump to current month">
+            <i class="fa-solid fa-calendar-day text-indigo-600"></i> Go to Current Month
           </button>
 
-          <!-- Manage Employees Button (Hidden for Viewers) -->
-          <button id="manageEmpBtn" onclick="openEmployeeModal()" class="px-3 py-1 text-xs font-semibold rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 transition items-center gap-1.5 shadow-2xs hidden">
-            <i class="fa-solid fa-user-gear text-indigo-600"></i> Manage
+          <!-- Manage Employees Button -->
+          <button onclick="openEmployeeModal()" class="px-3 py-1 text-xs font-semibold rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 transition flex items-center gap-1.5 shadow-2xs" title="Add or edit employees and DOJ">
+            <i class="fa-solid fa-user-gear text-indigo-600"></i> Manage Employees
           </button>
 
           <button id="tabAnnualBtn" class="px-3 py-1 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
-            <i class="fa-solid fa-chart-pie mr-1 text-slate-500"></i> Annual
+            <i class="fa-solid fa-chart-pie mr-1 text-slate-500"></i> Annual Overview
           </button>
 
-          <!-- Sync Button (Hidden for Viewers) -->
-          <button id="saveDataBtn" onclick="handleSync()" class="px-3.5 py-1 text-xs font-bold rounded-lg bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white shadow-xs transition items-center gap-1.5 hidden">
+          <button id="saveDataBtn" onclick="handleSync()" class="px-3.5 py-1 text-xs font-bold rounded-lg bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white shadow-xs transition flex items-center gap-1.5" title="Sync data to Google Sheets">
             <i class="fa-solid fa-cloud-arrow-up text-emerald-200 text-sm"></i>
             <span>Sync</span>
-          </button>
-
-          <!-- Login/Logout Button -->
-          <button id="adminAuthBtn" onclick="openAdminLogin()" class="px-3 py-1 text-xs font-bold rounded-lg border transition flex items-center gap-1.5 bg-slate-50 text-slate-700 border-slate-300 hover:bg-slate-100">
-            <i class="fa-solid fa-lock text-slate-500"></i> Admin Login
           </button>
         </div>
       </div>
     </header>
 
     <!-- Pinned Statuses Legend Bar -->
-    <div id="stickyLegendBar" class="bg-slate-50/95 px-4 sm:px-6 py-1.5 backdrop-blur-xs border-b border-slate-200">
+    <div id="stickyLegendBar" class="bg-slate-50/95 px-4 sm:px-6 py-1.5 backdrop-blur-xs">
       <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 text-xs">
         <div class="flex flex-wrap items-center gap-1.5">
           <span class="font-bold text-slate-500 uppercase tracking-wider text-[10px] mr-1">STATUSES:</span>
-          <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md font-semibold bg-sky-100 text-sky-800 border border-sky-300 text-[11px]"><span class="w-2 h-2 rounded-full bg-sky-500"></span> WO</span>
-          <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200 text-[11px]"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> P</span>
-          <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md font-semibold bg-rose-100 text-rose-800 border border-rose-200 text-[11px]"><span class="w-2 h-2 rounded-full bg-rose-500"></span> H</span>
-          <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md font-semibold bg-red-100 text-red-900 border border-red-200 text-[11px]"><span class="w-2 h-2 rounded-full bg-red-600"></span> LWP</span>
-          <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md font-semibold bg-amber-100 text-amber-900 border border-amber-200 text-[11px]"><span class="w-2 h-2 rounded-full bg-amber-500"></span> FH/SH (0.5)</span>
+          <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md font-semibold bg-sky-100 text-sky-800 border border-sky-300 text-[11px]">
+            <span class="w-2 h-2 rounded-full bg-sky-500"></span> WO <span class="text-[10px] text-sky-600 font-normal">[Sat/Sun Auto]</span>
+          </span>
+          <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md font-semibold bg-purple-100 text-purple-800 border border-purple-200 text-[11px]">
+            <span class="w-2 h-2 rounded-full bg-purple-600"></span> BH
+          </span>
+          <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200 text-[11px]">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Present (P)
+          </span>
+          <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md font-semibold bg-rose-100 text-rose-800 border border-rose-200 text-[11px]">
+            <span class="w-2 h-2 rounded-full bg-rose-500"></span> Holiday (H)
+          </span>
+          <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md font-semibold bg-red-100 text-red-900 border border-red-200 text-[11px]">
+            <span class="w-2 h-2 rounded-full bg-red-600"></span> LWP
+          </span>
+          <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md font-semibold bg-amber-100 text-amber-900 border border-amber-200 text-[11px]">
+            <span class="w-2 h-2 rounded-full bg-amber-500"></span> FH (0.5)
+          </span>
+          <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md font-semibold bg-orange-100 text-orange-900 border border-orange-200 text-[11px]">
+            <span class="w-2 h-2 rounded-full bg-orange-500"></span> SH (0.5)
+          </span>
         </div>
         
         <div id="syncStatus" class="flex items-center gap-1.5 text-[11px] font-medium text-slate-500">
           <i class="fa-solid fa-cloud text-slate-400"></i> Loading cloud data...
         </div>
+        
       </div>
     </div>
   </div>
 
   <!-- Main Body Content -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 pt-3 pb-24 flex flex-col gap-6" id="mainContentArea">
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 pt-3 pb-24 flex flex-col gap-6">
     
     <div id="monthlyView" class="w-full space-y-8">
       <div id="allMonthsContainer" class="space-y-8 w-full"></div>
     </div>
 
-    <!-- Annual Overview View -->
+    <!-- Annual Overview View with Date of Joining (DOJ) -->
     <div id="annualView" class="hidden space-y-4">
       <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-md">
         <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
           <div>
             <div class="flex items-center gap-2">
-              <h2 class="text-base font-bold text-slate-900">Annual Leaves &amp; Holidays Summary:</h2>
-              <select id="annualCycleSelect" class="bg-indigo-50 border border-indigo-200 text-indigo-900 font-bold text-xs rounded-lg px-2.5 py-1 focus:ring-2 focus:ring-indigo-500 focus:outline-none cursor-pointer"></select>
+              <h2 class="text-base font-bold text-slate-900">
+                Annual Leaves &amp; Holidays Summary:
+              </h2>
+              <select id="annualCycleSelect" class="bg-indigo-50 border border-indigo-200 text-indigo-900 font-bold text-xs rounded-lg px-2.5 py-1 focus:ring-2 focus:ring-indigo-500 focus:outline-none cursor-pointer">
+              </select>
             </div>
+            <p class="text-xs text-slate-500 mt-1">Company Annual Cycle: <b>1st June to 31st May</b> &bull; Total Leaves strictly excludes Week Offs &amp; Bank Holidays</p>
           </div>
           <div class="text-xs text-rose-800 bg-rose-50 px-3 py-1.5 rounded-lg border border-rose-200 font-medium">
-            <i class="fa-solid fa-calculator mr-1"></i> Total = Holiday + LWP + Half-Days (0.5)
+            <i class="fa-solid fa-calculator mr-1"></i> Total Holidays / Leaves = Holiday (H) + LWP + Half-Days (0.5)
           </div>
         </div>
 
@@ -202,13 +190,13 @@
             <thead>
               <tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
                 <th class="py-3 px-4">Employee</th>
-                <th class="py-3 px-3 text-center">DOJ</th>
-                <th class="py-3 px-3 text-center text-sky-700 bg-sky-50/70">WO</th>
-                <th class="py-3 px-3 text-center text-purple-700 bg-purple-50/70">BH</th>
-                <th class="py-3 px-3 text-center text-rose-600">Holiday</th>
-                <th class="py-3 px-3 text-center text-red-600">LWP</th>
-                <th class="py-3 px-3 text-center text-amber-600">Half Days</th>
-                <th class="py-3 px-3 text-center font-extrabold text-rose-950 bg-rose-100">Total Leaves</th>
+                <th class="py-3 px-3 text-center text-indigo-700 font-bold bg-indigo-50/70">Date of Joining (DOJ)</th>
+                <th class="py-3 px-3 text-center text-sky-700 font-bold bg-sky-50/70" title="Informational only">Week Offs (WO)</th>
+                <th class="py-3 px-3 text-center text-purple-700 font-bold bg-purple-50/70" title="Informational only">Bank Holidays (BH)</th>
+                <th class="py-3 px-3 text-center text-rose-600 font-semibold">Holiday (H)</th>
+                <th class="py-3 px-3 text-center text-red-600 font-semibold">LWP</th>
+                <th class="py-3 px-3 text-center text-amber-600 font-semibold">Half Days (FH+SH)</th>
+                <th class="py-3 px-3 text-center font-extrabold text-rose-950 bg-rose-100" title="Holiday + LWP + (Half * 0.5)">Total Holidays / Leaves</th>
               </tr>
             </thead>
             <tbody id="annualSummaryBody" class="divide-y divide-slate-200">
@@ -217,53 +205,157 @@
         </div>
       </div>
     </div>
+
   </main>
 
-  <!-- Employee Management Modal -->
-  <div id="employeeModal" class="hidden fixed inset-0 bg-slate-900/40 z-50 flex items-center justify-center p-4">
+  <!-- Employee Management Modal (Add, Edit, DOJ) -->
+  <div id="employeeModal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-2xs z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-lg w-full p-6 space-y-4">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-        <h3 class="font-bold text-sm text-slate-900">Manage Employee Roster</h3>
-        <button onclick="closeEmployeeModal()" class="text-slate-400 hover:text-slate-600 p-1"><i class="fa-solid fa-xmark text-base"></i></button>
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-sm">
+            <i class="fa-solid fa-users-gear"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-sm text-slate-900">Manage Employee Roster</h3>
+            <p class="text-xs text-slate-500">Add new staff, edit names, or update Date of Joining (DOJ)</p>
+          </div>
+        </div>
+        <button onclick="closeEmployeeModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+          <i class="fa-solid fa-xmark text-base"></i>
+        </button>
       </div>
-      <div class="grid grid-cols-1 sm:grid-cols-7 gap-2">
-        <input type="text" id="newEmpName" placeholder="Employee Name" class="sm:col-span-4 border border-slate-300 rounded-lg px-2 py-1.5 text-xs">
-        <input type="date" id="newEmpDoj" class="sm:col-span-3 border border-slate-300 rounded-lg px-2 py-1.5 text-xs">
+
+      <!-- Add New Employee Form -->
+      <div class="bg-indigo-50/50 border border-indigo-100 rounded-xl p-3.5 space-y-2">
+        <span class="text-xs font-bold text-indigo-900"><i class="fa-solid fa-user-plus mr-1 text-indigo-600"></i> Add New Employee</span>
+        <div class="grid grid-cols-1 sm:grid-cols-7 gap-2">
+          <input type="text" id="newEmpName" placeholder="Employee Name" class="sm:col-span-4 bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <input type="date" id="newEmpDoj" class="sm:col-span-3 bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" title="Date of Joining">
+        </div>
+        <button onclick="addNewEmployee()" class="w-full mt-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-1.5 rounded-lg text-xs transition flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-plus"></i> Add to Staff Roster
+        </button>
       </div>
-      <button onclick="addNewEmployee()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-1.5 rounded-lg text-xs">Add Employee</button>
-      <div id="employeeListContainer" class="max-h-60 overflow-y-auto space-y-2 pr-1"></div>
+
+      <!-- Current Employee List with Inline Editing -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between text-xs font-bold text-slate-700">
+          <span>Current Employees (<span id="empCountDisplay">0</span>)</span>
+          <span class="text-[11px] text-slate-400 font-normal">Editing updates attendance records dynamically</span>
+        </div>
+        <div id="employeeListContainer" class="max-h-60 overflow-y-auto space-y-2 pr-1">
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+        <button onclick="closeEmployeeModal()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-semibold transition">
+          Close
+        </button>
+      </div>
     </div>
   </div>
 
   <!-- Day Column Modal -->
-  <div id="dayColumnModal" class="hidden fixed inset-0 bg-slate-900/40 z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-5 space-y-4">
-        <h3 id="modalDayColumnTitle" class="font-bold text-sm text-slate-900">Update Date</h3>
-        <p class="text-[11px] text-slate-500">Apply status to all staff:</p>
-        <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
-            <button onclick="setDayColumnStatus('P')" class="col-span-2 p-2.5 bg-emerald-500 text-white rounded-lg">Mark All Present (P)</button>
-            <button onclick="setDayColumnStatus('WO')" class="p-2.5 bg-sky-50 text-sky-800 rounded-lg border border-sky-300">Week Off (WO)</button>
-            <button onclick="setDayColumnStatus('H')" class="p-2.5 bg-rose-50 text-rose-800 rounded-lg border border-rose-300">Holiday (H)</button>
+  <div id="dayColumnModal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-2xs z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-sm w-full p-5 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 rounded bg-indigo-100 text-indigo-700 font-extrabold text-xs" id="dayModalBadge">All Employees</span>
+            <h3 id="modalDayColumnTitle" class="font-bold text-sm text-slate-900">Update Date</h3>
+          </div>
+          <p id="modalDayColumnSubtitle" class="text-xs text-slate-500 mt-0.5">Select a status to apply across all staff</p>
         </div>
-        <div class="flex justify-between pt-2 border-t"><button onclick="setDayColumnStatus('EMPTY')" class="text-xs text-rose-600">Reset</button><button onclick="closeDayColumnModal()" class="text-xs text-slate-700">Cancel</button></div>
+        <button onclick="closeDayColumnModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+          <i class="fa-solid fa-xmark text-base"></i>
+        </button>
+      </div>
+
+      <p class="text-[11px] text-slate-500">Choose attendance status for everyone on this day:</p>
+
+      <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
+        <button onclick="setDayColumnStatus('P')" class="col-span-2 flex items-center justify-center gap-2 p-2.5 rounded-lg border border-emerald-300 bg-emerald-500 hover:bg-emerald-600 text-white shadow-xs transition">
+          <span class="w-3 h-3 rounded-full bg-white"></span> Mark All as Present (P)
+        </button>
+        <button onclick="setDayColumnStatus('BH')" class="col-span-2 flex items-center justify-center gap-2 p-2.5 rounded-lg border border-purple-200 bg-purple-600 hover:bg-purple-700 text-white shadow-xs transition">
+          <span class="w-3 h-3 rounded-full bg-white"></span> Bank Holiday (BH) - All Staff
+        </button>
+        <button onclick="setDayColumnStatus('WO')" class="flex items-center gap-2 p-2.5 rounded-lg border border-sky-300 bg-sky-50 text-sky-800 hover:bg-sky-100 transition">
+          <span class="w-3 h-3 rounded-full bg-sky-500"></span> Week Off (WO)
+        </button>
+        <button onclick="setDayColumnStatus('H')" class="flex items-center gap-2 p-2.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-800 hover:bg-rose-100 transition">
+          <span class="w-3 h-3 rounded-full bg-rose-500"></span> Holiday (H)
+        </button>
+        <button onclick="setDayColumnStatus('LWP')" class="flex items-center gap-2 p-2.5 rounded-lg border border-red-200 bg-red-50 text-red-800 hover:bg-red-100 transition">
+          <span class="w-3 h-3 rounded-full bg-red-600"></span> LWP
+        </button>
+        <button onclick="setDayColumnStatus('FH')" class="flex items-center gap-2 p-2.5 rounded-lg border border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100 transition">
+          <span class="w-3 h-3 rounded-full bg-amber-500"></span> 1st Half (FH)
+        </button>
+        <button onclick="setDayColumnStatus('SH')" class="col-span-2 flex items-center justify-center gap-2 p-2 rounded-lg border border-orange-200 bg-orange-50 text-orange-800 hover:bg-orange-100 transition">
+          <span class="w-3 h-3 rounded-full bg-orange-500"></span> 2nd Half (SH)
+        </button>
+      </div>
+
+      <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+        <button onclick="setDayColumnStatus('EMPTY')" class="text-xs text-rose-600 hover:text-rose-800 font-semibold flex items-center gap-1">
+          <i class="fa-regular fa-trash-can"></i> Reset to Default
+        </button>
+        <button onclick="closeDayColumnModal()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg font-medium transition">
+          Cancel
+        </button>
+      </div>
     </div>
   </div>
 
   <!-- Single Cell Modal -->
-  <div id="statusModal" class="hidden fixed inset-0 bg-slate-900/40 z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-5 space-y-4">
-      <h3 id="modalEmpName" class="font-bold text-sm text-slate-900">Employee Name</h3>
-      <p id="modalDateInfo" class="text-xs text-slate-500">Date Info</p>
-      <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
-        <button onclick="setCellStatus('P')" class="col-span-2 p-2.5 bg-emerald-500 text-white rounded-lg">Present (P)</button>
-        <button onclick="setCellStatus('WO')" class="p-2.5 bg-sky-50 text-sky-800 rounded-lg border border-sky-300">Week Off (WO)</button>
-        <button onclick="setCellStatus('BH')" class="p-2.5 bg-purple-50 text-purple-800 rounded-lg border border-purple-300">Bank Holiday (BH)</button>
-        <button onclick="setCellStatus('H')" class="p-2.5 bg-rose-50 text-rose-800 rounded-lg border border-rose-300">Holiday (H)</button>
-        <button onclick="setCellStatus('LWP')" class="p-2.5 bg-red-50 text-red-800 rounded-lg border border-red-300">Leave W/O Pay</button>
-        <button onclick="setCellStatus('FH')" class="p-2.5 bg-amber-50 text-amber-800 rounded-lg border border-amber-300">1st Half</button>
-        <button onclick="setCellStatus('SH')" class="p-2.5 bg-orange-50 text-orange-800 rounded-lg border border-orange-300">2nd Half</button>
+  <div id="statusModal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-2xs z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-sm w-full p-5 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div>
+          <h3 id="modalEmpName" class="font-bold text-sm text-slate-900">Employee Name</h3>
+          <p id="modalDateInfo" class="text-xs text-slate-500">Date Info</p>
+        </div>
+        <button id="closeModalBtn" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+          <i class="fa-solid fa-xmark text-base"></i>
+        </button>
       </div>
-      <div class="flex justify-between pt-2 border-t"><button onclick="setCellStatus('EMPTY')" class="text-xs text-rose-600">Clear Day</button><button onclick="closeModal()" class="text-xs text-slate-700">Cancel</button></div>
+
+      <p class="text-[11px] text-slate-500">Change individual employee status:</p>
+
+      <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
+        <button onclick="setCellStatus('P')" class="col-span-2 flex items-center justify-center gap-2 p-2.5 rounded-lg border border-emerald-300 bg-emerald-500 hover:bg-emerald-600 text-white shadow-xs transition">
+          <span class="w-3 h-3 rounded-full bg-white"></span> Mark as Present (P)
+        </button>
+        <button onclick="setCellStatus('WO')" class="flex items-center gap-2 p-2.5 rounded-lg border border-sky-300 bg-sky-50 text-sky-800 hover:bg-sky-100 transition">
+          <span class="w-3 h-3 rounded-full bg-sky-500"></span> Week Off (WO)
+        </button>
+        <button onclick="setCellStatus('BH')" class="flex items-center gap-2 p-2.5 rounded-lg border border-purple-200 bg-purple-50 text-purple-800 hover:bg-purple-100 transition">
+          <span class="w-3 h-3 rounded-full bg-purple-600"></span> Bank Holiday (BH)
+        </button>
+        <button onclick="setCellStatus('H')" class="flex items-center gap-2 p-2.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-800 hover:bg-rose-100 transition">
+          <span class="w-3 h-3 rounded-full bg-rose-500"></span> Holiday (H)
+        </button>
+        <button onclick="setCellStatus('LWP')" class="flex items-center gap-2 p-2.5 rounded-lg border border-red-200 bg-red-50 text-red-800 hover:bg-red-100 transition">
+          <span class="w-3 h-3 rounded-full bg-red-600"></span> Leave Without Pay (LWP)
+        </button>
+        <button onclick="setCellStatus('FH')" class="flex items-center gap-2 p-2.5 rounded-lg border border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100 transition">
+          <span class="w-3 h-3 rounded-full bg-amber-500"></span> 1st Half (FH)
+        </button>
+        <button onclick="setCellStatus('SH')" class="flex items-center gap-2 p-2.5 rounded-lg border border-orange-200 bg-orange-50 text-orange-800 hover:bg-orange-100 transition">
+          <span class="w-3 h-3 rounded-full bg-orange-500"></span> 2nd Half (SH)
+        </button>
+      </div>
+
+      <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+        <button onclick="setCellStatus('EMPTY')" class="text-xs text-rose-600 hover:text-rose-800 font-semibold flex items-center gap-1">
+          <i class="fa-regular fa-trash-can"></i> Clear Day (Empty)
+        </button>
+        <button onclick="closeModal()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg font-medium transition">
+          Cancel
+        </button>
+      </div>
     </div>
   </div>
 
@@ -274,76 +366,21 @@
   </div>
 
   <script>
-    // --- ROLE BASED ACCESS CONTROL (RBAC) LOGIC ---
-    let currentUserRole = 'VIEWER'; // App always starts in Viewer Mode
-
-    function openAdminLogin() {
-      document.getElementById('adminAuthModal').classList.remove('hidden');
-      document.getElementById('adminPassword').focus();
-    }
-
-    function closeAdminLogin() {
-      document.getElementById('adminAuthModal').classList.add('hidden');
-      document.getElementById('adminPassword').value = '';
-    }
-
-    function attemptAdminLogin() {
-      const pwd = document.getElementById('adminPassword').value;
-      if (pwd === 'admin123') { 
-        currentUserRole = 'ADMIN';
-        closeAdminLogin();
-        applyPermissions();
-        showToast("Logged in successfully. Editing unlocked.");
-      } else {
-        alert('Incorrect Admin Password!');
-      }
-    }
-
-    function logoutAdmin() {
-      currentUserRole = 'VIEWER';
-      applyPermissions();
-      showToast("Logged out. Returned to Read-Only mode.");
-    }
-
-    function applyPermissions() {
-      const roleBadge = document.getElementById('roleDisplayBadge');
-      const manageBtn = document.getElementById('manageEmpBtn');
-      const syncBtn = document.getElementById('saveDataBtn');
-      const authBtn = document.getElementById('adminAuthBtn');
-      
-      if (currentUserRole === 'ADMIN') {
-        roleBadge.innerHTML = '<i class="fa-solid fa-shield-halved text-emerald-500 mr-1"></i> ADMIN (EDITING)';
-        roleBadge.className = 'text-[9px] px-1.5 py-0.5 rounded font-bold bg-emerald-50 border border-emerald-200 text-emerald-700 tracking-wide';
-        manageBtn.style.display = 'flex';
-        syncBtn.style.display = 'flex';
-        
-        authBtn.innerHTML = '<i class="fa-solid fa-lock-open text-rose-500"></i> Logout';
-        authBtn.className = 'px-3 py-1 text-xs font-bold rounded-lg border transition flex items-center gap-1.5 bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100';
-        authBtn.onclick = logoutAdmin;
-      } else {
-        roleBadge.innerHTML = '<i class="fa-regular fa-eye text-sky-500 mr-1"></i> VIEWER (READ-ONLY)';
-        roleBadge.className = 'text-[9px] px-1.5 py-0.5 rounded font-bold bg-sky-50 border border-sky-200 text-sky-700 tracking-wide';
-        manageBtn.style.display = 'none';
-        syncBtn.style.display = 'none';
-        
-        authBtn.innerHTML = '<i class="fa-solid fa-lock text-slate-500"></i> Admin Login';
-        authBtn.className = 'px-3 py-1 text-xs font-bold rounded-lg border transition flex items-center gap-1.5 bg-slate-50 text-slate-700 border-slate-300 hover:bg-slate-100';
-        authBtn.onclick = openAdminLogin;
-      }
-
-      // Re-render table to hide/show specific elements (like reset buttons and pointer cursors)
-      renderTable();
-    }
-    // ----------------------------------------------
-
     // --- GOOGLE APPS SCRIPT WEB APP URL ---
     const GOOGLE_APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyu_ygmy_SsILjOGRUvuBQG1tcim8VkoKjeLWdmUk-i2H_eMNCvnfQ8YaRuY3Iii3lE/exec";
 
+    // Configurable Employee Roster (Object with name and Date of Joining)
     const DEFAULT_EMPLOYEES = [
-      { name: "Rakesh", doj: "" }, { name: "Kuldeep", doj: "" }, { name: "Anil", doj: "" }
+      { name: "Rakesh", doj: "" },
+      { name: "Kuldeep", doj: "" },
+      { name: "Anil", doj: "" },
+      { name: "Karan", doj: "" },
+      { name: "Jagdish", doj: "" },
+      { name: "Vinay", doj: "" }
     ];
 
     let employeeRoster = [];
+
     const STATUS_MAP = {
       'WO':  { label: 'WO',  name: 'Week Off',            bg: 'bg-sky-100 text-sky-800 font-bold border border-sky-300' },
       'P':   { label: 'P',   name: 'Present',             bg: 'bg-emerald-500 text-white font-bold shadow-2xs' },
@@ -357,78 +394,646 @@
     const realToday = new Date();
     const realTodayYear = realToday.getFullYear();
     const realTodayMonth = realToday.getMonth();
+    const realTodayDate = realToday.getDate();
 
     let selectedCycleStartYear = 2026;
     let activeCellTarget = null;
     let activeDayColumnTarget = null;
 
-    const STORAGE_KEY = 'attendance_sheet_records_v10';
+    const STORAGE_KEY = 'attendance_sheet_records_v10_stacked_cycle';
     const EMPLOYEES_STORAGE_KEY = 'attendance_sheet_employees_v10';
     let attendanceData = {};
 
     function updateStickyMeasurements() {
       const topBar = document.getElementById('topStickyHeader');
       if (topBar) {
-        document.documentElement.style.setProperty('--top-sticky-height', `${topBar.offsetHeight}px`);
+        const height = topBar.offsetHeight;
+        document.documentElement.style.setProperty('--top-sticky-height', `${height}px`);
       }
     }
 
     async function loadStorage() {
+      const syncStatus = document.getElementById('syncStatus');
       try {
-        const rawEmps = localStorage.getItem(EMPLOYEES_STORAGE_KEY);
-        if (rawEmps) employeeRoster = JSON.parse(rawEmps);
-        else employeeRoster = JSON.parse(JSON.stringify(DEFAULT_EMPLOYEES));
-          
-        const rawAtt = localStorage.getItem(STORAGE_KEY);
-        if (rawAtt) attendanceData = JSON.parse(rawAtt);
+        if(syncStatus) syncStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-indigo-500"></i> Loading cloud data...';
         
-        applyPermissions(); // Setup UI based on Viewer default
-      } catch (e) {
-        console.error("Local load failed.");
+        const response = await fetch(GOOGLE_APP_SCRIPT_URL);
+        const data = await response.json();
+
+        if (data.employees && data.employees.length > 0) {
+          employeeRoster = data.employees;
+          attendanceData = data.attendance || {};
+          migrateLegacyAbsentToHoliday();
+        } else {
+          employeeRoster = JSON.parse(JSON.stringify(DEFAULT_EMPLOYEES));
+          attendanceData = {};
+        }
+
+        if(syncStatus) syncStatus.innerHTML = '<i class="fa-solid fa-cloud-check text-emerald-500"></i> Cloud Synced';
+        
+        renderTable();
+        if (!document.getElementById('annualView').classList.contains('hidden')) {
+          renderAnnualOverview();
+        }
+        if (!document.getElementById('employeeModal').classList.contains('hidden')) {
+          renderEmployeeListModal();
+        }
+      } catch (error) {
+        console.error("Failed to load from Google Sheets:", error);
+        if(syncStatus) syncStatus.innerHTML = '<i class="fa-solid fa-cloud-xmark text-rose-500"></i> Offline mode';
+        
+        try {
+          const rawEmps = localStorage.getItem(EMPLOYEES_STORAGE_KEY);
+          if (rawEmps) employeeRoster = JSON.parse(rawEmps);
+          else employeeRoster = JSON.parse(JSON.stringify(DEFAULT_EMPLOYEES));
+          
+          const rawAtt = localStorage.getItem(STORAGE_KEY);
+          if (rawAtt) {
+            attendanceData = JSON.parse(rawAtt);
+            migrateLegacyAbsentToHoliday();
+          }
+          renderTable();
+        } catch (e) {
+          console.error("Local fallback failed.");
+        }
       }
     }
 
+    function migrateLegacyAbsentToHoliday() {
+      if (!attendanceData || typeof attendanceData !== 'object') return;
+      Object.keys(attendanceData).forEach(mKey => {
+        const monthObj = attendanceData[mKey];
+        if (monthObj && typeof monthObj === 'object') {
+          Object.keys(monthObj).forEach(emp => {
+            const empObj = monthObj[emp];
+            if (empObj && typeof empObj === 'object') {
+              Object.keys(empObj).forEach(d => {
+                if (empObj[d] === 'A') {
+                  empObj[d] = 'H';
+                }
+              });
+            }
+          });
+        }
+      });
+    }
+
     async function saveStorage() {
-      if (currentUserRole !== 'ADMIN') return; 
+      const syncStatus = document.getElementById('syncStatus');
+      
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(attendanceData));
         localStorage.setItem(EMPLOYEES_STORAGE_KEY, JSON.stringify(employeeRoster));
       } catch (e) {
         console.warn("Local storage write failed", e);
       }
+
+      try {
+        if(syncStatus) syncStatus.innerHTML = '<i class="fa-solid fa-arrows-rotate fa-spin text-indigo-500"></i> Syncing...';
+        
+        await fetch(GOOGLE_APP_SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            attendance: attendanceData,
+            employees: employeeRoster
+          }),
+          redirect: 'follow', 
+          headers: {
+            'Content-Type': 'text/plain;charset=utf-8',
+          }
+        });
+        
+        if(syncStatus) syncStatus.innerHTML = '<i class="fa-solid fa-cloud-check text-emerald-500"></i> Cloud Synced';
+      } catch (error) {
+        console.error("Failed to sync to Google Sheets:", error);
+        if(syncStatus) syncStatus.innerHTML = '<i class="fa-solid fa-cloud-xmark text-rose-500"></i> Cloud Sync Failed';
+      }
     }
 
     function handleSync() {
-      if (currentUserRole !== 'ADMIN') {
-        showToast("Viewers cannot sync data.");
-        return;
-      }
       saveStorage();
-      showToast(`Data successfully synced to Google Sheets!`);
+      
+      const saveBtn = document.getElementById('saveDataBtn');
+      if (saveBtn) {
+        const originalContent = saveBtn.innerHTML;
+        saveBtn.innerHTML = `<i class="fa-solid fa-check text-emerald-200 text-sm"></i><span>Synced!</span>`;
+        saveBtn.classList.remove('bg-emerald-600', 'hover:bg-emerald-700');
+        saveBtn.classList.add('bg-emerald-800');
+        setTimeout(() => {
+          saveBtn.innerHTML = originalContent;
+          saveBtn.classList.remove('bg-emerald-800');
+          saveBtn.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
+        }, 1800);
+      }
+      
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      showToast(`Data successfully synced to Google Sheets at ${timeStr}!`);
     }
 
-    function getMonthKey(y, m) { return `${y}-${m}`; }
-    function getDaysInMonth(year, month) { return new Date(year, month + 1, 0).getDate(); }
+    function getMonthKey(y, m) {
+      return `${y}-${m}`;
+    }
+
+    function getDaysInMonth(year, month) {
+      return new Date(year, month + 1, 0).getDate();
+    }
 
     function getEffectiveStatus(y, m, d, emp) {
       const monthKey = getMonthKey(y, m);
       const userValue = attendanceData[monthKey]?.[emp]?.[d];
-      if (userValue !== undefined) return userValue === 'EMPTY' ? '' : userValue;
+
+      if (userValue !== undefined) {
+        if (userValue === 'A') return 'H';
+        return userValue === 'EMPTY' ? '' : userValue;
+      }
+
       const dow = new Date(y, m, d).getDay();
-      return (dow === 0 || dow === 6) ? 'WO' : 'P';
+      if (dow === 0 || dow === 6) {
+        return 'WO';
+      }
+
+      return 'P';
     }
 
     function getAnnualCycleMonths(startYear) {
       const cycle = [];
-      for (let m = 5; m <= 11; m++) cycle.push({ year: startYear, month: m });
-      for (let m = 0; m <= 4; m++) cycle.push({ year: startYear + 1, month: m });
+      for (let m = 5; m <= 11; m++) {
+        cycle.push({ year: startYear, month: m });
+      }
+      for (let m = 0; m <= 4; m++) {
+        cycle.push({ year: startYear + 1, month: m });
+      }
       return cycle;
     }
 
-    // --- RENDER TABLE ---
+    function findMatchingEmployee(nameStr) {
+      if (!nameStr) return null;
+      const clean = nameStr.trim().toLowerCase();
+      const match = employeeRoster.find(e => e.name.toLowerCase() === clean);
+      return match ? match.name : null;
+    }
+
+    // Converts any standard YYYY-MM-DD input date to exact DD-MM-YYYY format
+    function formatToDDMMYYYY(dateStr) {
+      if (!dateStr || typeof dateStr !== 'string') return 'Not Set';
+      const clean = dateStr.trim();
+      if (!clean) return 'Not Set';
+      const parts = clean.split(/[-/]/);
+      if (parts.length === 3) {
+        if (parts[0].length === 4) {
+          const y = parts[0];
+          const m = String(parts[1]).padStart(2, '0');
+          const d = String(parts[2]).padStart(2, '0');
+          return `${d}-${m}-${y}`;
+        }
+        if (parts[2].length === 4) {
+          const d = String(parts[0]).padStart(2, '0');
+          const m = String(parts[1]).padStart(2, '0');
+          const y = parts[2];
+          return `${d}-${m}-${y}`;
+        }
+      }
+      return clean;
+    }
+
+    function formatDisplayDate(dateStr) {
+      const formatted = formatToDDMMYYYY(dateStr);
+      if (formatted === 'Not Set') {
+        return '<span class="text-slate-400 font-normal italic">Not Set</span>';
+      }
+      return `<span class="font-bold text-slate-800 tracking-wide">${formatted}</span>`;
+    }
+
+    // --- EMPLOYEE ROSTER MANAGEMENT FUNCTIONS ---
+    function openEmployeeModal() {
+      renderEmployeeListModal();
+      document.getElementById('newEmpName').value = '';
+      document.getElementById('newEmpDoj').value = '';
+      document.getElementById('employeeModal').classList.remove('hidden');
+    }
+
+    function closeEmployeeModal() {
+      document.getElementById('employeeModal').classList.add('hidden');
+    }
+
+    function renderEmployeeListModal() {
+      const container = document.getElementById('employeeListContainer');
+      const countDisplay = document.getElementById('empCountDisplay');
+      if (!container) return;
+
+      countDisplay.textContent = employeeRoster.length;
+      let html = '';
+
+      employeeRoster.forEach((emp, index) => {
+        html += `
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
+            <div class="flex items-center gap-2 flex-1 min-w-[200px]">
+              <span class="w-6 h-6 rounded-full bg-purple-100 text-purple-700 font-bold text-xs inline-flex items-center justify-center">${emp.name.charAt(0)}</span>
+              <input type="text" value="${emp.name}" onchange="updateEmployeeName(${index}, this.value)" class="font-bold text-slate-800 bg-white border border-slate-300 rounded-md px-2 py-1 flex-1 focus:ring-1 focus:ring-indigo-500 focus:outline-none">
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="flex items-center gap-1">
+                <span class="text-[10px] text-slate-400 font-semibold uppercase">DOJ:</span>
+                <input type="date" value="${emp.doj || ''}" onchange="updateEmployeeDoj(${index}, this.value)" class="bg-white border border-slate-300 text-slate-700 text-xs rounded-md px-1.5 py-1 focus:ring-1 focus:ring-indigo-500 focus:outline-none">
+              </div>
+              <button onclick="deleteEmployee(${index})" class="text-rose-500 hover:text-rose-700 hover:bg-rose-50 p-1.5 rounded-lg transition" title="Delete employee">
+                <i class="fa-regular fa-trash-can"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      });
+
+      if (employeeRoster.length === 0) {
+        html = `<div class="text-center py-4 text-xs text-slate-400 italic">No employees configured. Add one above.</div>`;
+      }
+
+      container.innerHTML = html;
+    }
+
+    function addNewEmployee() {
+      const nameInput = document.getElementById('newEmpName');
+      const dojInput = document.getElementById('newEmpDoj');
+      const name = nameInput.value.trim();
+      const doj = dojInput.value.trim();
+
+      if (!name) {
+        showToast("Please enter an employee name.");
+        return;
+      }
+
+      const exists = employeeRoster.some(e => e.name.toLowerCase() === name.toLowerCase());
+      if (exists) {
+        showToast("An employee with this name already exists.");
+        return;
+      }
+
+      employeeRoster.push({ name, doj });
+      saveStorage();
+      renderEmployeeListModal();
+      renderTable();
+      renderAnnualOverview();
+      nameInput.value = '';
+      dojInput.value = '';
+      showToast(`Added ${name} (DOJ: ${formatToDDMMYYYY(doj)}).`);
+    }
+
+    function updateEmployeeName(index, newName) {
+      newName = newName.trim();
+      if (!newName) {
+        showToast("Name cannot be empty.");
+        renderEmployeeListModal();
+        return;
+      }
+
+      const oldName = employeeRoster[index].name;
+      if (oldName === newName) return;
+
+      const exists = employeeRoster.some((e, i) => i !== index && e.name.toLowerCase() === newName.toLowerCase());
+      if (exists) {
+        showToast("Another employee with this name already exists.");
+        renderEmployeeListModal();
+        return;
+      }
+
+      Object.keys(attendanceData).forEach(mKey => {
+        if (attendanceData[mKey] && attendanceData[mKey][oldName]) {
+          attendanceData[mKey][newName] = attendanceData[mKey][oldName];
+          delete attendanceData[mKey][oldName];
+        }
+      });
+
+      employeeRoster[index].name = newName;
+      saveStorage();
+      renderTable();
+      renderAnnualOverview();
+      showToast(`Renamed ${oldName} to ${newName}.`);
+    }
+
+    function updateEmployeeDoj(index, newDoj) {
+      employeeRoster[index].doj = newDoj;
+      saveStorage();
+      renderAnnualOverview();
+      showToast(`Updated DOJ to ${formatToDDMMYYYY(newDoj)} for ${employeeRoster[index].name}.`);
+    }
+
+    function deleteEmployee(index) {
+      const emp = employeeRoster[index];
+      if (!confirm(`Are you sure you want to remove ${emp.name}? This will remove them from the active display.`)) {
+        return;
+      }
+
+      employeeRoster.splice(index, 1);
+      saveStorage();
+      renderEmployeeListModal();
+      renderTable();
+      renderAnnualOverview();
+      showToast(`Removed ${emp.name} from employee list.`);
+    }
+
+    // --- PURE VECTOR PDF GENERATOR: MONTHLY GRID + ANNUAL OVERVIEW WITH DD-MM-YYYY DOJ ---
+    function generateMonthPDF(year, month) {
+      const { jsPDF } = window.jspdf;
+      const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      const dayNames = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+      const daysCount = getDaysInMonth(year, month);
+      const monthTitle = `${monthNames[month]} ${year}`;
+
+      showToast(`Generating complete vector PDF report for ${monthTitle}...`);
+
+      const doc = new jsPDF({
+        orientation: 'landscape',
+        unit: 'pt',
+        format: 'a4'
+      });
+
+      const pageWidth = doc.internal.pageSize.getWidth();
+
+      // Top Header
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(15);
+      doc.setTextColor(15, 23, 42);
+      doc.text("SKRUPAM ENTERPRISES", 28, 30);
+
+      doc.setFontSize(10);
+      doc.setTextColor(79, 70, 229);
+      doc.text(`Monthly Attendance & Annual Overview Report — ${monthTitle}`, 28, 44);
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7.5);
+      doc.setTextColor(100, 116, 139);
+      const generatedAt = `Annual Cycle: 1st June ${selectedCycleStartYear} to 31st May ${selectedCycleStartYear + 1}   |   Generated: ${new Date().toLocaleDateString('en-GB')} ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+      doc.text(generatedAt, pageWidth - 28, 38, { align: 'right' });
+
+      // Legend Bar
+      doc.setDrawColor(226, 232, 240);
+      doc.setFillColor(248, 250, 252);
+      doc.roundedRect(28, 52, pageWidth - 56, 17, 3, 3, "FD");
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(7);
+      doc.setTextColor(51, 65, 85);
+      doc.text("STATUS KEYS:", 34, 63);
+
+      const legends = [
+        { label: "P: Present", color: [21, 128, 61] },
+        { label: "WO: Week Off (Sat/Sun)", color: [3, 105, 161] },
+        { label: "BH: Bank Holiday", color: [126, 34, 206] },
+        { label: "H: Holiday", color: [225, 29, 72] },
+        { label: "LWP: Leave Without Pay", color: [220, 38, 38] },
+        { label: "FH/SH: Half Day (0.5)", color: [217, 119, 6] }
+      ];
+
+      let lx = 98;
+      legends.forEach(item => {
+        doc.setTextColor(item.color[0], item.color[1], item.color[2]);
+        doc.text(item.label, lx, 63);
+        lx += doc.getTextWidth(item.label) + 14;
+      });
+
+      // SECTION 1: Monthly Attendance Table
+      const headers = [
+        { header: 'Employee', dataKey: 'emp' }
+      ];
+
+      for (let d = 1; d <= daysCount; d++) {
+        const dObj = new Date(year, month, d);
+        const dow = dayNames[dObj.getDay()];
+        headers.push({
+          header: `${dow}\n${d}`,
+          dataKey: `d_${d}`
+        });
+      }
+
+      headers.push(
+        { header: 'WO', dataKey: 'wo' },
+        { header: 'BH', dataKey: 'bh' },
+        { header: 'H', dataKey: 'h' },
+        { header: 'LWP', dataKey: 'lwp' },
+        { header: 'Half', dataKey: 'half' },
+        { header: 'Month\nLeaves', dataKey: 'total' }
+      );
+
+      const tableData = [];
+      employeeRoster.forEach(empObj => {
+        const emp = empObj.name;
+        let woCount = 0;
+        let bhCount = 0;
+        let holidayCount = 0;
+        let lwpCount = 0;
+        let halfCount = 0;
+
+        const row = { emp };
+
+        for (let d = 1; d <= daysCount; d++) {
+          const st = getEffectiveStatus(year, month, d, emp);
+          row[`d_${d}`] = st || '';
+
+          if (st === 'WO') woCount++;
+          else if (st === 'BH') bhCount++;
+          else if (st === 'H') holidayCount++;
+          else if (st === 'LWP') lwpCount++;
+          else if (st === 'FH' || st === 'SH') halfCount++;
+        }
+
+        const totalMonthLeaves = holidayCount + lwpCount + (halfCount * 0.5);
+
+        row.wo = woCount;
+        row.bh = bhCount;
+        row.h = holidayCount;
+        row.lwp = lwpCount;
+        row.half = halfCount;
+        row.total = totalMonthLeaves;
+
+        tableData.push(row);
+      });
+
+      const colStyles = {
+        emp: { fontStyle: 'bold', halign: 'left', cellWidth: 54, textColor: [30, 41, 59] },
+        wo: { fontStyle: 'bold', halign: 'center', cellWidth: 19, fillColor: [240, 249, 255], textColor: [3, 105, 161] },
+        bh: { fontStyle: 'bold', halign: 'center', cellWidth: 19, fillColor: [250, 245, 255], textColor: [126, 34, 206] },
+        h: { fontStyle: 'bold', halign: 'center', cellWidth: 17, textColor: [225, 29, 72] },
+        lwp: { fontStyle: 'bold', halign: 'center', cellWidth: 20, textColor: [220, 38, 38] },
+        half: { fontStyle: 'bold', halign: 'center', cellWidth: 18, textColor: [217, 119, 6] },
+        total: { fontStyle: 'bold', halign: 'center', cellWidth: 32, fillColor: [254, 226, 226], textColor: [136, 19, 55] }
+      };
+
+      for (let d = 1; d <= daysCount; d++) {
+        colStyles[`d_${d}`] = { halign: 'center', cellWidth: 'auto', fontSize: 6.8 };
+      }
+
+      doc.autoTable({
+        columns: headers,
+        body: tableData,
+        startY: 76,
+        margin: { left: 28, right: 28 },
+        theme: 'grid',
+        tableWidth: 'auto',
+        styles: {
+          fontSize: 7,
+          cellPadding: 2.2,
+          lineWidth: 0.5,
+          lineColor: [203, 213, 225],
+          font: 'helvetica'
+        },
+        headStyles: {
+          fillColor: [241, 245, 249],
+          textColor: [51, 65, 85],
+          fontStyle: 'bold',
+          halign: 'center',
+          valign: 'middle'
+        },
+        columnStyles: colStyles,
+        didParseCell: function(data) {
+          if (data.section === 'head' && data.column.dataKey.startsWith('d_')) {
+            const dayNum = parseInt(data.column.dataKey.replace('d_', ''), 10);
+            const dow = new Date(year, month, dayNum).getDay();
+            if (dow === 0 || dow === 6) {
+              data.cell.styles.fillColor = [224, 242, 254];
+              data.cell.styles.textColor = [3, 105, 161];
+            }
+          }
+
+          if (data.section === 'body' && data.column.dataKey.startsWith('d_')) {
+            const val = data.cell.raw;
+            if (val === 'P') {
+              data.cell.styles.fillColor = [220, 252, 231];
+              data.cell.styles.textColor = [21, 128, 61];
+              data.cell.styles.fontStyle = 'bold';
+            } else if (val === 'WO') {
+              data.cell.styles.fillColor = [224, 242, 254];
+              data.cell.styles.textColor = [3, 105, 161];
+              data.cell.styles.fontStyle = 'bold';
+            } else if (val === 'BH') {
+              data.cell.styles.fillColor = [243, 232, 255];
+              data.cell.styles.textColor = [126, 34, 206];
+              data.cell.styles.fontStyle = 'bold';
+            } else if (val === 'H') {
+              data.cell.styles.fillColor = [255, 228, 230];
+              data.cell.styles.textColor = [190, 18, 60];
+              data.cell.styles.fontStyle = 'bold';
+            } else if (val === 'LWP') {
+              data.cell.styles.fillColor = [254, 226, 226];
+              data.cell.styles.textColor = [185, 28, 28];
+              data.cell.styles.fontStyle = 'bold';
+            } else if (val === 'FH' || val === 'SH') {
+              data.cell.styles.fillColor = [254, 243, 199];
+              data.cell.styles.textColor = [180, 83, 9];
+              data.cell.styles.fontStyle = 'bold';
+            }
+          }
+        }
+      });
+
+      // SECTION 2: Annual Overview directly beneath with DD-MM-YYYY DOJ
+      const monthTableBottomY = doc.lastAutoTable.finalY;
+      const annualStartY = monthTableBottomY + 16;
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9.5);
+      doc.setTextColor(15, 23, 42);
+      doc.text(`ANNUAL OVERVIEW SUMMARY (Company Cycle: 1st June ${selectedCycleStartYear} to 31st May ${selectedCycleStartYear + 1})`, 28, annualStartY);
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7.5);
+      doc.setTextColor(100, 116, 139);
+      doc.text("Cumulative 12-Month Leaves & Holidays (Excludes WO & BH)", pageWidth - 28, annualStartY, { align: 'right' });
+
+      const cycleMonths = getAnnualCycleMonths(selectedCycleStartYear);
+      const annualHeaders = [
+        { header: 'Employee', dataKey: 'emp' },
+        { header: 'Date of Joining', dataKey: 'doj' },
+        { header: 'Week Offs (WO)', dataKey: 'totalWO' },
+        { header: 'Bank Holidays (BH)', dataKey: 'totalBH' },
+        { header: 'Holiday (H)', dataKey: 'totalHoliday' },
+        { header: 'Leave Without Pay (LWP)', dataKey: 'totalLWP' },
+        { header: 'Half Days (FH+SH)', dataKey: 'totalHalf' },
+        { header: 'Total Annual Holidays / Leaves', dataKey: 'annualLeaves' }
+      ];
+
+      const annualData = [];
+      employeeRoster.forEach(empObj => {
+        const emp = empObj.name;
+        let totalWO = 0;
+        let totalBH = 0;
+        let totalHoliday = 0;
+        let totalLWP = 0;
+        let totalHalf = 0;
+
+        cycleMonths.forEach(({ year: cyYear, month: cyMonth }) => {
+          const daysInM = getDaysInMonth(cyYear, cyMonth);
+          for (let d = 1; d <= daysInM; d++) {
+            const st = getEffectiveStatus(cyYear, cyMonth, d, emp);
+            if (st === 'WO') totalWO++;
+            else if (st === 'BH') totalBH++;
+            else if (st === 'H') totalHoliday++;
+            else if (st === 'LWP') totalLWP++;
+            else if (st === 'FH' || st === 'SH') totalHalf++;
+          }
+        });
+
+        const annualLeaves = totalHoliday + totalLWP + (totalHalf * 0.5);
+
+        annualData.push({
+          emp,
+          doj: formatToDDMMYYYY(empObj.doj), // Formats cleanly into DD-MM-YYYY
+          totalWO,
+          totalBH,
+          totalHoliday,
+          totalLWP,
+          totalHalf,
+          annualLeaves
+        });
+      });
+
+      doc.autoTable({
+        columns: annualHeaders,
+        body: annualData,
+        startY: annualStartY + 6,
+        margin: { left: 28, right: 28 },
+        theme: 'grid',
+        styles: {
+          fontSize: 7.5,
+          cellPadding: 3,
+          lineWidth: 0.5,
+          lineColor: [203, 213, 225],
+          font: 'helvetica'
+        },
+        headStyles: {
+          fillColor: [241, 245, 249],
+          textColor: [51, 65, 85],
+          fontStyle: 'bold',
+          halign: 'center',
+          valign: 'middle'
+        },
+        columnStyles: {
+          emp: { fontStyle: 'bold', halign: 'left', cellWidth: 75, textColor: [30, 41, 59] },
+          doj: { halign: 'center', cellWidth: 80, textColor: [79, 70, 229], fontStyle: 'bold' },
+          totalWO: { halign: 'center', cellWidth: 'auto', fillColor: [240, 249, 255], textColor: [3, 105, 161], fontStyle: 'bold' },
+          totalBH: { halign: 'center', cellWidth: 'auto', fillColor: [250, 245, 255], textColor: [126, 34, 206], fontStyle: 'bold' },
+          totalHoliday: { halign: 'center', cellWidth: 'auto', textColor: [225, 29, 72], fontStyle: 'bold' },
+          totalLWP: { halign: 'center', cellWidth: 'auto', textColor: [220, 38, 38], fontStyle: 'bold' },
+          totalHalf: { halign: 'center', cellWidth: 'auto', textColor: [217, 119, 6], fontStyle: 'bold' },
+          annualLeaves: { halign: 'center', cellWidth: 120, fillColor: [254, 226, 226], textColor: [136, 19, 55], fontStyle: 'bold' }
+        }
+      });
+
+      const finalY = doc.lastAutoTable.finalY + 16;
+      doc.setFontSize(7);
+      doc.setTextColor(100, 116, 139);
+      doc.setFont("helvetica", "normal");
+      doc.text("* Note: Total Holidays / Leaves formula strictly = Holiday + LWP + (Half x 0.5). Week Offs (WO) and Bank Holidays (BH) are strictly excluded.", 28, finalY);
+      doc.text("Authorized Signatory: ____________________________", pageWidth - 28, finalY, { align: 'right' });
+
+      doc.save(`SKRUPAM_Attendance_Report_${monthNames[month]}_${year}.pdf`);
+      showToast(`Vector PDF Report with Annual Overview downloaded for ${monthTitle}!`);
+    }
+
     function renderTable() {
       const cycleMonths = getAnnualCycleMonths(selectedCycleStartYear);
       const allMonthsContainer = document.getElementById('allMonthsContainer');
+
       const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
       const dayNames = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
 
@@ -440,16 +1045,37 @@
         const monthTitle = `${monthNames[month]} ${year}`;
         const isCurrentRealMonth = (year === realTodayYear && month === realTodayMonth);
 
+        if (!attendanceData[mKey]) attendanceData[mKey] = {};
+        employeeRoster.forEach(emp => {
+          if (!attendanceData[mKey][emp.name]) attendanceData[mKey][emp.name] = {};
+        });
+
         containerHtml += `
-          <article class="snap-month-card bg-white rounded-2xl shadow-sm border border-slate-200/90 overflow-hidden">
+          <article id="month-section-${mKey}" data-mkey="${mKey}" class="snap-month-card bg-white rounded-2xl shadow-sm border border-slate-200/90 overflow-hidden">
             <div class="px-5 py-3 bg-gradient-to-r from-slate-50 via-white to-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
-              <h2 class="text-sm sm:text-base font-bold text-slate-900">${monthTitle}</h2>
+              <div class="flex items-center gap-2.5">
+                <div class="text-indigo-600 text-sm sm:text-base">
+                  <i class="fa-solid fa-calendar-days"></i>
+                </div>
+                <h2 class="text-sm sm:text-base font-bold text-slate-900 leading-tight">
+                  ${monthTitle}
+                </h2>
+                <span class="text-xs text-slate-400 font-medium">(${daysCount} Days)</span>
+                ${isCurrentRealMonth ? '<span class="text-[11px] bg-purple-100 text-purple-700 font-bold px-2 py-0.5 rounded-full border border-purple-200 animate-pulse">Current Month</span>' : ''}
+              </div>
+
               <div class="flex items-center gap-2">
-                ${currentUserRole === 'ADMIN' ? `
-                <button onclick="resetSpecificMonth(${year}, ${month})" class="px-2.5 py-1 text-xs font-medium rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 transition flex items-center gap-1.5">
+                <span class="text-[11px] text-slate-400 italic hidden sm:inline">
+                  <i class="fa-solid fa-arrow-pointer mr-1 text-indigo-400"></i>Click date to update all
+                </span>
+
+                <button onclick="generateMonthPDF(${year}, ${month})" class="px-2.5 py-1 text-xs font-semibold rounded-lg text-rose-700 hover:text-white bg-rose-50 hover:bg-rose-600 border border-rose-200 hover:border-rose-600 transition flex items-center gap-1.5 shadow-2xs" title="Export ${monthTitle} attendance and annual overview as vector PDF">
+                  <i class="fa-solid fa-file-pdf text-rose-500 hover:text-white"></i> PDF Report
+                </button>
+
+                <button onclick="resetSpecificMonth(${year}, ${month})" class="px-2.5 py-1 text-xs font-medium rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 transition flex items-center gap-1.5" title="Reset this month to default">
                   <i class="fa-solid fa-rotate-left text-slate-400"></i> Reset Month
                 </button>
-                ` : ''}
               </div>
             </div>
 
@@ -457,164 +1083,375 @@
               <table class="w-full text-left border-collapse text-xs select-none">
                 <thead class="bg-slate-50 text-slate-700 font-semibold sticky-header">
                   <tr>
-                    <th class="sticky-corner-emp bg-slate-50 py-2.5 px-3 border-r border-b border-slate-200 font-bold w-36">Employee</th>`;
+                    <th class="sticky-corner-emp bg-slate-50 py-2.5 px-3 text-left w-36 border-r border-b border-slate-200 font-bold text-slate-800">
+                      Employee
+                    </th>`;
 
         for (let d = 1; d <= daysCount; d++) {
           const dObj = new Date(year, month, d);
-          const dow = dObj.getDay();
-          const colBg = (dow === 0 || dow === 6) ? 'bg-sky-50 text-sky-800' : 'bg-slate-50 text-slate-700';
-          
+          const dayOfWeek = dObj.getDay();
+          const isSun = dayOfWeek === 0;
+          const isSat = dayOfWeek === 6;
+          const colBg = (isSun || isSat) ? 'bg-sky-50 text-sky-800 font-bold' : 'bg-slate-50 text-slate-700';
+
           containerHtml += `
-            <th class="py-2 px-1 text-center border-r border-b border-slate-200 min-w-[34px] transition ${colBg} ${currentUserRole === 'ADMIN' ? 'cursor-pointer hover:bg-indigo-50' : ''}"
-                onclick="handleDayHeaderClick(${year}, ${month}, ${d})">
-              <div class="text-[10px] uppercase">${dayNames[dow]}</div>
-              <div class="text-xs font-bold">${d}</div>
+            <th class="py-2 px-1 text-center border-r border-b border-slate-200 min-w-[34px] cursor-pointer hover:bg-indigo-50 hover:text-indigo-800 transition group ${colBg}"
+                onclick="handleDayHeaderClick(${year}, ${month}, ${d})"
+                title="Click to update all employees on ${monthNames[month]} ${d}">
+              <div class="text-[10px] uppercase font-semibold group-hover:text-indigo-600">${dayNames[dayOfWeek]}</div>
+              <div class="text-xs font-bold flex items-center justify-center gap-0.5">
+                <span>${d}</span>
+                <i class="fa-solid fa-pen text-[8px] opacity-0 group-hover:opacity-100 text-indigo-500 transition-opacity"></i>
+              </div>
             </th>`;
         }
 
         containerHtml += `
-                    <th class="py-2 px-2 text-center border-b border-slate-200 bg-rose-100 min-w-[95px]">Total Leaves</th>
+                    <th class="py-2 px-2 text-center border-r border-b border-slate-200 text-sky-800 font-bold bg-sky-50 min-w-[46px]" title="Week Offs (Sat &amp; Sun) - Informational">WO</th>
+                    <th class="py-2 px-2 text-center border-r border-b border-slate-200 text-purple-700 font-bold bg-purple-50 min-w-[46px]" title="Bank Holidays - Informational">BH</th>
+                    <th class="py-2 px-2 text-center border-r border-b border-slate-200 text-rose-700 font-bold bg-slate-50 min-w-[50px]">Holiday</th>
+                    <th class="py-2 px-2 text-center border-r border-b border-slate-200 text-red-700 font-bold bg-slate-50 min-w-[46px]">LWP</th>
+                    <th class="py-2 px-2 text-center border-r border-b border-slate-200 text-amber-700 font-bold bg-slate-50 min-w-[48px]">Half</th>
+                    <th class="py-2 px-3 text-center border-b border-slate-200 text-rose-950 font-black bg-rose-100 min-w-[95px]" title="Total Holidays / Leaves = Holiday + LWP + (Half * 0.5)">
+                      Total Holidays / Leaves
+                    </th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 bg-white">`;
 
         employeeRoster.forEach(empObj => {
           const emp = empObj.name;
-          let holidayCount = 0, lwpCount = 0, halfCount = 0;
+          let woCount = 0;
+          let bhCount = 0;
+          let holidayCount = 0;
+          let lwpCount = 0;
+          let halfCount = 0;
 
           for (let d = 1; d <= daysCount; d++) {
             const st = getEffectiveStatus(year, month, d, emp);
-            if (st === 'H') holidayCount++;
+            if (st === 'WO') woCount++;
+            else if (st === 'BH') bhCount++;
+            else if (st === 'H') holidayCount++;
             else if (st === 'LWP') lwpCount++;
             else if (st === 'FH' || st === 'SH') halfCount++;
           }
 
-          const totalLeaves = holidayCount + lwpCount + (halfCount * 0.5);
+          const totalHolidaysAndLeaves = holidayCount + lwpCount + (halfCount * 0.5);
 
           containerHtml += `
             <tr class="hover:bg-slate-50/80 transition-colors">
-              <td class="sticky-col-emp bg-white py-2 px-3 border-r border-b border-slate-100 font-bold">${emp}</td>`;
+              <td class="sticky-col-emp bg-white py-2 px-3 border-r border-b border-slate-100 font-bold text-slate-800 flex items-center gap-2">
+                <span class="w-5 h-5 rounded-full bg-purple-100 text-purple-700 inline-flex items-center justify-center font-bold text-[10px]">${emp.charAt(0)}</span>
+                <span>${emp}</span>
+              </td>`;
 
           for (let d = 1; d <= daysCount; d++) {
             const status = getEffectiveStatus(year, month, d, emp);
-            let badgeClass = status && STATUS_MAP[status] ? STATUS_MAP[status].bg : 'bg-white border border-dashed border-slate-200 text-slate-300';
-            let badgeContent = status && STATUS_MAP[status] ? STATUS_MAP[status].label : '&nbsp;';
-            let pointerClass = currentUserRole === 'ADMIN' ? 'cursor-pointer transform active:scale-90 hover:opacity-80' : 'cursor-default';
+            const dObj = new Date(year, month, d);
+            const isSun = dObj.getDay() === 0;
+            const isSat = dObj.getDay() === 6;
+
+            let badgeContent = '&nbsp;';
+            let badgeClass = 'text-slate-300 hover:bg-slate-100 hover:border-slate-300 border border-dashed border-slate-200';
+
+            if (status && STATUS_MAP[status]) {
+              badgeContent = STATUS_MAP[status].label;
+              badgeClass = `${STATUS_MAP[status].bg}`;
+            } else {
+              badgeClass = 'bg-white hover:bg-slate-100 border border-dashed border-slate-200 text-slate-300';
+            }
 
             containerHtml += `
-              <td class="p-1 text-center border-r border-b border-slate-100" onclick="handleCellClick('${emp}', ${year}, ${month}, ${d})">
-                <div class="h-6 w-6 sm:h-7 sm:w-7 mx-auto rounded-md flex items-center justify-center text-[10px] transition-all ${badgeClass} ${pointerClass}">
+              <td class="p-1 text-center border-r border-b border-slate-100 cursor-pointer" onclick="handleCellClick('${emp}', ${year}, ${month}, ${d})">
+                <div class="h-6 w-6 sm:h-7 sm:w-7 mx-auto rounded-md flex items-center justify-center text-[10px] transition-all transform active:scale-90 ${badgeClass}" title="${emp} - ${monthTitle} Day ${d} (${isSat ? 'Saturday' : isSun ? 'Sunday' : 'Weekday'}): ${status ? STATUS_MAP[status].name + ' (Click to change)' : 'Cleared'}">
                   ${badgeContent}
                 </div>
               </td>`;
           }
 
-          containerHtml += `<td class="py-2 px-3 text-center border-b border-slate-100 font-black bg-rose-100">${totalLeaves}</td></tr>`;
+          containerHtml += `
+              <td class="py-2 px-2 text-center border-r border-b border-slate-100 text-sky-800 font-bold bg-sky-50/50">${woCount}</td>
+              <td class="py-2 px-2 text-center border-r border-b border-slate-100 text-purple-700 font-bold bg-purple-50/50">${bhCount}</td>
+              <td class="py-2 px-2 text-center border-r border-b border-slate-100 text-rose-700 font-bold">${holidayCount}</td>
+              <td class="py-2 px-2 text-center border-r border-b border-slate-100 text-red-700 font-bold">${lwpCount}</td>
+              <td class="py-2 px-2 text-center border-r border-b border-slate-100 text-amber-700 font-bold">${halfCount}</td>
+              <td class="py-2 px-3 text-center border-b border-slate-100 text-rose-950 font-black bg-rose-100 text-sm">
+                ${totalHolidaysAndLeaves}
+              </td>
+            </tr>`;
         });
 
-        containerHtml += `</tbody></table></div></article>`;
+        containerHtml += `
+                </tbody>
+              </table>
+            </div>
+          </article>`;
       });
 
       allMonthsContainer.innerHTML = containerHtml;
+      renderAnnualOverview();
       updateStickyMeasurements();
     }
 
-    // --- INTERACTION HANDLERS WITH PERMISSION CHECKS ---
+    function initAnnualCycleDropdown() {
+      const select = document.getElementById('annualCycleSelect');
+      if (!select) return;
+      const currentSelectedVal = select.value;
+      select.innerHTML = '';
+
+      for (let y = 2026; y <= 2035; y++) {
+        const opt = document.createElement('option');
+        opt.value = y;
+        opt.textContent = `1st June ${y} – 31st May ${y + 1}`;
+        select.appendChild(opt);
+      }
+
+      select.value = currentSelectedVal || selectedCycleStartYear;
+    }
+
+    function renderAnnualOverview() {
+      initAnnualCycleDropdown();
+      const cycleMonths = getAnnualCycleMonths(selectedCycleStartYear);
+      const tbody = document.getElementById('annualSummaryBody');
+      if (!tbody) return;
+
+      let html = '';
+      employeeRoster.forEach(empObj => {
+        const emp = empObj.name;
+        let totalWO = 0;
+        let totalBH = 0;
+        let totalHoliday = 0;
+        let totalLWP = 0;
+        let totalHalf = 0;
+
+        cycleMonths.forEach(({ year, month }) => {
+          const daysInM = getDaysInMonth(year, month);
+          for (let d = 1; d <= daysInM; d++) {
+            const st = getEffectiveStatus(year, month, d, emp);
+            if (st === 'WO') totalWO++;
+            else if (st === 'BH') totalBH++;
+            else if (st === 'H') totalHoliday++;
+            else if (st === 'LWP') totalLWP++;
+            else if (st === 'FH' || st === 'SH') totalHalf++;
+          }
+        });
+
+        const totalHolidaysAndLeaves = totalHoliday + totalLWP + (totalHalf * 0.5);
+
+        html += `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="py-3 px-4 font-bold text-slate-800 flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-purple-100 text-purple-700 inline-flex items-center justify-center font-bold text-xs">${emp.charAt(0)}</span>
+              ${emp}
+            </td>
+            <td class="py-3 px-3 text-center bg-indigo-50/30">
+              ${formatDisplayDate(empObj.doj)}
+            </td>
+            <td class="py-3 px-3 text-center font-bold text-sky-700 bg-sky-50/50">${totalWO}</td>
+            <td class="py-3 px-3 text-center font-bold text-purple-700 bg-purple-50/50">${totalBH}</td>
+            <td class="py-3 px-3 text-center font-semibold text-rose-600">${totalHoliday}</td>
+            <td class="py-3 px-3 text-center font-semibold text-red-600">${totalLWP}</td>
+            <td class="py-3 px-3 text-center font-semibold text-amber-600">${totalHalf}</td>
+            <td class="py-3 px-3 text-center font-extrabold text-rose-950 bg-rose-100 text-sm">
+              ${totalHolidaysAndLeaves}
+            </td>
+          </tr>`;
+      });
+
+      tbody.innerHTML = html;
+    }
 
     function handleDayHeaderClick(year, month, day) {
-      if (currentUserRole !== 'ADMIN') {
-        showToast("Read-Only Mode. Please login to edit.");
-        return;
-      }
       activeDayColumnTarget = { year, month, day };
+      const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+      const dObj = new Date(year, month, day);
+      const dayName = daysOfWeek[dObj.getDay()];
+
+      document.getElementById('modalDayColumnTitle').textContent = `${monthNames[month]} ${day}, ${year}`;
+      document.getElementById('modalDayColumnSubtitle').textContent = `${dayName} • Apply to all ${employeeRoster.length} employees`;
+      document.getElementById('dayModalBadge').textContent = `All ${employeeRoster.length} Employees`;
       document.getElementById('dayColumnModal').classList.remove('hidden');
     }
 
+    function closeDayColumnModal() {
+      document.getElementById('dayColumnModal').classList.add('hidden');
+      activeDayColumnTarget = null;
+    }
+
     function setDayColumnStatus(status) {
-      if (currentUserRole !== 'ADMIN') return;
+      if (!activeDayColumnTarget) return;
       const { year, month, day } = activeDayColumnTarget;
       const monthKey = getMonthKey(year, month);
+      const dow = new Date(year, month, day).getDay();
+      const isWeekend = (dow === 0 || dow === 6);
+
       if (!attendanceData[monthKey]) attendanceData[monthKey] = {};
 
       employeeRoster.forEach(empObj => {
         const emp = empObj.name;
         if (!attendanceData[monthKey][emp]) attendanceData[monthKey][emp] = {};
-        if (status === 'EMPTY') delete attendanceData[monthKey][emp][day];
-        else attendanceData[monthKey][emp][day] = status;
+
+        if (status === 'EMPTY') {
+          delete attendanceData[monthKey][emp][day];
+        } else if (!isWeekend && status === 'P') {
+          delete attendanceData[monthKey][emp][day];
+        } else if (isWeekend && status === 'WO') {
+          delete attendanceData[monthKey][emp][day];
+        } else {
+          attendanceData[monthKey][emp][day] = status;
+        }
       });
 
       saveStorage();
       renderTable();
       closeDayColumnModal();
-      showToast(`Updated all employees to ${status}.`);
+
+      const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      const statusLabel = status === 'EMPTY' ? 'Reset to Default' : (STATUS_MAP[status]?.name || status);
+      showToast(`Updated all employees to ${statusLabel} for ${monthNames[month]} ${day}`);
     }
 
     function handleCellClick(emp, year, month, day) {
-      if (currentUserRole !== 'ADMIN') {
-        showToast("Read-Only Mode. Please login to edit.");
-        return;
-      }
+      const currentStatus = getEffectiveStatus(year, month, day, emp);
       activeCellTarget = { emp, year, month, day };
+
+      const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      const dObj = new Date(year, month, day);
+      const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+      const dayName = daysOfWeek[dObj.getDay()];
+      const statusTitle = STATUS_MAP[currentStatus]?.name || (currentStatus ? currentStatus : 'Cleared / Empty');
+
+      document.getElementById('modalEmpName').textContent = `${emp}`;
+      document.getElementById('modalDateInfo').textContent = `${dayName}, ${monthNames[month]} ${day}, ${year} (Current: ${statusTitle})`;
       document.getElementById('statusModal').classList.remove('hidden');
     }
 
     function setCellStatus(status) {
-      if (currentUserRole !== 'ADMIN') return;
+      if (!activeCellTarget) return;
       const { emp, year, month, day } = activeCellTarget;
       const monthKey = getMonthKey(year, month);
-      
+      const dow = new Date(year, month, day).getDay();
+      const isWeekend = (dow === 0 || dow === 6);
+
       if (!attendanceData[monthKey]) attendanceData[monthKey] = {};
       if (!attendanceData[monthKey][emp]) attendanceData[monthKey][emp] = {};
-      
-      if (status === 'EMPTY') attendanceData[monthKey][emp][day] = 'EMPTY';
-      else attendanceData[monthKey][emp][day] = status;
+
+      if (status === 'EMPTY') {
+        attendanceData[monthKey][emp][day] = 'EMPTY';
+      } else if (!isWeekend && status === 'P') {
+        delete attendanceData[monthKey][emp][day];
+      } else if (isWeekend && status === 'WO') {
+        delete attendanceData[monthKey][emp][day];
+      } else {
+        attendanceData[monthKey][emp][day] = status;
+      }
 
       saveStorage();
       renderTable();
       closeModal();
-      showToast(`${emp} updated successfully.`);
+      showToast(`${emp} Day ${day} updated to ${status === 'EMPTY' ? 'Cleared' : (STATUS_MAP[status]?.name || status)}`);
+    }
+
+    function closeModal() {
+      document.getElementById('statusModal').classList.add('hidden');
+      activeCellTarget = null;
     }
 
     function resetSpecificMonth(year, month) {
-      if (currentUserRole !== 'ADMIN') return;
-      
+      const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
       const key = getMonthKey(year, month);
       delete attendanceData[key];
       saveStorage();
       renderTable();
-      showToast(`Month reset to default.`);
+      showToast(`Reset ${monthNames[month]} ${year} to default values.`);
     }
 
-    // --- MODAL CLOSERS ---
-    function closeModal() { document.getElementById('statusModal').classList.add('hidden'); }
-    function closeDayColumnModal() { document.getElementById('dayColumnModal').classList.add('hidden'); }
-    function openEmployeeModal() { if (currentUserRole === 'ADMIN') document.getElementById('employeeModal').classList.remove('hidden'); }
-    function closeEmployeeModal() { document.getElementById('employeeModal').classList.add('hidden'); }
-    
     function showToast(msg) {
       const toast = document.getElementById('toast');
       document.getElementById('toastMsg').textContent = msg;
       toast.classList.remove('opacity-0', 'translate-y-3', 'pointer-events-none');
-      setTimeout(() => toast.classList.add('opacity-0', 'translate-y-3', 'pointer-events-none'), 3000);
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-3', 'pointer-events-none');
+      }, 3200);
     }
 
-    // Initialize Setup
+    window.addEventListener('resize', updateStickyMeasurements);
+
     document.addEventListener('DOMContentLoaded', () => {
-      loadStorage(); // Automatically starts in Viewer Mode now
-      
-      // Cycle and Tab events
-      document.getElementById('mainCycleSelect').addEventListener('change', (e) => {
-        selectedCycleStartYear = parseInt(e.target.value, 10);
-        renderTable();
+      loadStorage();
+      updateStickyMeasurements();
+
+      const mainCycleSelect = document.getElementById('mainCycleSelect');
+      const goToTodayBtn = document.getElementById('goToTodayBtn');
+      const tabAnnualBtn = document.getElementById('tabAnnualBtn');
+      const monthlyView = document.getElementById('monthlyView');
+      const annualView = document.getElementById('annualView');
+      const closeModalBtn = document.getElementById('closeModalBtn');
+      const annualCycleSelect = document.getElementById('annualCycleSelect');
+
+      if (mainCycleSelect) {
+        mainCycleSelect.value = selectedCycleStartYear;
+        mainCycleSelect.addEventListener('change', (e) => {
+          selectedCycleStartYear = parseInt(e.target.value, 10);
+          if (annualCycleSelect) annualCycleSelect.value = selectedCycleStartYear;
+          renderTable();
+        });
+      }
+
+      if (annualCycleSelect) {
+        annualCycleSelect.addEventListener('change', (e) => {
+          selectedCycleStartYear = parseInt(e.target.value, 10);
+          if (mainCycleSelect) mainCycleSelect.value = selectedCycleStartYear;
+          renderTable();
+          renderAnnualOverview();
+        });
+      }
+
+      goToTodayBtn.addEventListener('click', () => {
+        if (annualView && !annualView.classList.contains('hidden')) {
+          annualView.classList.add('hidden');
+          monthlyView.classList.remove('hidden');
+          tabAnnualBtn.className = "px-3 py-1 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition";
+        }
+        const currentMKey = `${realTodayYear}-${realTodayMonth}`;
+        const targetSection = document.getElementById(`month-section-${currentMKey}`);
+        if (targetSection) {
+          targetSection.scrollIntoView({ behavior: 'smooth' });
+          showToast(`Navigated to ${realToday.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`);
+        } else {
+          showToast(`Current month is outside the active annual cycle (${selectedCycleStartYear}-${selectedCycleStartYear + 1}).`);
+        }
       });
 
-      document.getElementById('goToTodayBtn').addEventListener('click', () => {
-        showToast("Navigating to current month...");
+      tabAnnualBtn.addEventListener('click', () => {
+        const isAnnualOpen = !annualView.classList.contains('hidden');
+        if (isAnnualOpen) {
+          annualView.classList.add('hidden');
+          monthlyView.classList.remove('hidden');
+          tabAnnualBtn.className = "px-3 py-1 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition";
+        } else {
+          annualView.classList.remove('hidden');
+          monthlyView.classList.add('hidden');
+          renderAnnualOverview();
+          tabAnnualBtn.className = "px-3 py-1 text-xs font-semibold rounded-lg bg-indigo-600 text-white shadow-xs transition";
+        }
       });
 
-      document.getElementById('tabAnnualBtn').addEventListener('click', () => {
-        showToast("Annual features initialized.");
+      closeModalBtn.addEventListener('click', closeModal);
+      document.getElementById('statusModal').addEventListener('click', (e) => {
+        if (e.target.id === 'statusModal') closeModal();
       });
+
+      document.getElementById('dayColumnModal').addEventListener('click', (e) => {
+        if (e.target.id === 'dayColumnModal') closeDayColumnModal();
+      });
+
+      document.getElementById('employeeModal').addEventListener('click', (e) => {
+        if (e.target.id === 'employeeModal') closeEmployeeModal();
+      });
+
+      renderTable();
     });
   </script>
 </body>
