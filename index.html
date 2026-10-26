@@ -106,19 +106,30 @@
             <i class="fa-solid fa-calendar-day text-indigo-600"></i> Go to Current Month
           </button>
 
-          <!-- Manage Employees Button -->
-          <button onclick="openEmployeeModal()" class="px-3 py-1 text-xs font-semibold rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 transition flex items-center gap-1.5 shadow-2xs" title="Add or edit employees and DOJ">
+          <!-- Manage Employees Button (Hidden in Viewer Mode) -->
+          <button id="manageEmpBtn" onclick="openEmployeeModal()" class="hidden px-3 py-1 text-xs font-semibold rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 transition items-center gap-1.5 shadow-2xs" title="Add or edit employees and DOJ">
             <i class="fa-solid fa-user-gear text-indigo-600"></i> Manage Employees
           </button>
 
-          <button id="tabAnnualBtn" class="px-3 py-1 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+          <button id="tabAnnualBtn" class="px-3 py-1 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition flex items-center gap-1.5">
             <i class="fa-solid fa-chart-pie mr-1 text-slate-500"></i> Annual Overview
           </button>
 
-          <button id="saveDataBtn" onclick="handleSync()" class="px-3.5 py-1 text-xs font-bold rounded-lg bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white shadow-xs transition flex items-center gap-1.5" title="Sync data to Google Sheets">
+          <!-- Sync Button (Hidden in Viewer Mode) -->
+          <button id="saveDataBtn" onclick="handleSync()" class="hidden px-3.5 py-1 text-xs font-bold rounded-lg bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white shadow-xs transition items-center gap-1.5" title="Sync data to Google Sheets">
             <i class="fa-solid fa-cloud-arrow-up text-emerald-200 text-sm"></i>
             <span>Sync</span>
           </button>
+
+          <!-- Admin Login / Logout Buttons -->
+          <button id="adminLoginBtn" onclick="handleAdminLogin()" class="px-3 py-1 text-xs font-semibold rounded-lg bg-slate-800 text-white hover:bg-slate-900 transition flex items-center gap-1.5 shadow-2xs">
+            <i class="fa-solid fa-lock"></i> Admin Login
+          </button>
+          
+          <button id="adminLogoutBtn" onclick="handleAdminLogout()" class="hidden px-3 py-1 text-xs font-semibold rounded-lg bg-rose-100 text-rose-700 hover:bg-rose-200 transition items-center gap-1.5 shadow-2xs">
+            <i class="fa-solid fa-unlock"></i> Logout
+          </button>
+
         </div>
       </div>
     </header>
@@ -366,6 +377,51 @@
   </div>
 
   <script>
+    // --- ADMIN STATE ---
+    let isAdmin = false;
+
+    function handleAdminLogin() {
+      const pass = prompt("Enter Admin Password:");
+      if (pass === "admin123") {
+        isAdmin = true;
+        document.getElementById('adminLoginBtn').classList.add('hidden');
+        document.getElementById('adminLoginBtn').classList.remove('flex');
+        
+        document.getElementById('adminLogoutBtn').classList.remove('hidden');
+        document.getElementById('adminLogoutBtn').classList.add('flex');
+        
+        document.getElementById('manageEmpBtn').classList.remove('hidden');
+        document.getElementById('manageEmpBtn').classList.add('flex');
+        
+        document.getElementById('saveDataBtn').classList.remove('hidden');
+        document.getElementById('saveDataBtn').classList.add('flex');
+        
+        renderTable();
+        showToast("Admin access granted. Edit mode enabled.");
+      } else if (pass !== null) {
+        alert("Incorrect password!");
+      }
+    }
+
+    function handleAdminLogout() {
+      isAdmin = false;
+      document.getElementById('adminLogoutBtn').classList.add('hidden');
+      document.getElementById('adminLogoutBtn').classList.remove('flex');
+      
+      document.getElementById('adminLoginBtn').classList.remove('hidden');
+      document.getElementById('adminLoginBtn').classList.add('flex');
+      
+      document.getElementById('manageEmpBtn').classList.add('hidden');
+      document.getElementById('manageEmpBtn').classList.remove('flex');
+      
+      document.getElementById('saveDataBtn').classList.add('hidden');
+      document.getElementById('saveDataBtn').classList.remove('flex');
+      
+      renderTable();
+      showToast("Logged out of Admin mode. Viewer mode enabled.");
+    }
+
+
     // --- GOOGLE APPS SCRIPT WEB APP URL ---
     const GOOGLE_APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyu_ygmy_SsILjOGRUvuBQG1tcim8VkoKjeLWdmUk-i2H_eMNCvnfQ8YaRuY3Iii3lE/exec";
 
@@ -479,6 +535,7 @@
     }
 
     async function saveStorage() {
+      if (!isAdmin) return; // Extra layer of protection
       const syncStatus = document.getElementById('syncStatus');
       
       try {
@@ -574,7 +631,6 @@
       return match ? match.name : null;
     }
 
-    // Converts any standard YYYY-MM-DD input date to exact DD-MM-YYYY format
     function formatToDDMMYYYY(dateStr) {
       if (!dateStr || typeof dateStr !== 'string') return 'Not Set';
       const clean = dateStr.trim();
@@ -607,6 +663,7 @@
 
     // --- EMPLOYEE ROSTER MANAGEMENT FUNCTIONS ---
     function openEmployeeModal() {
+      if (!isAdmin) return;
       renderEmployeeListModal();
       document.getElementById('newEmpName').value = '';
       document.getElementById('newEmpDoj').value = '';
@@ -653,6 +710,7 @@
     }
 
     function addNewEmployee() {
+      if (!isAdmin) return;
       const nameInput = document.getElementById('newEmpName');
       const dojInput = document.getElementById('newEmpDoj');
       const name = nameInput.value.trim();
@@ -680,6 +738,7 @@
     }
 
     function updateEmployeeName(index, newName) {
+      if (!isAdmin) return;
       newName = newName.trim();
       if (!newName) {
         showToast("Name cannot be empty.");
@@ -712,6 +771,7 @@
     }
 
     function updateEmployeeDoj(index, newDoj) {
+      if (!isAdmin) return;
       employeeRoster[index].doj = newDoj;
       saveStorage();
       renderAnnualOverview();
@@ -719,6 +779,7 @@
     }
 
     function deleteEmployee(index) {
+      if (!isAdmin) return;
       const emp = employeeRoster[index];
       if (!confirm(`Are you sure you want to remove ${emp.name}? This will remove them from the active display.`)) {
         return;
@@ -1065,17 +1126,17 @@
               </div>
 
               <div class="flex items-center gap-2">
-                <span class="text-[11px] text-slate-400 italic hidden sm:inline">
+                ${isAdmin ? `<span class="text-[11px] text-slate-400 italic hidden sm:inline">
                   <i class="fa-solid fa-arrow-pointer mr-1 text-indigo-400"></i>Click date to update all
-                </span>
+                </span>` : ''}
 
                 <button onclick="generateMonthPDF(${year}, ${month})" class="px-2.5 py-1 text-xs font-semibold rounded-lg text-rose-700 hover:text-white bg-rose-50 hover:bg-rose-600 border border-rose-200 hover:border-rose-600 transition flex items-center gap-1.5 shadow-2xs" title="Export ${monthTitle} attendance and annual overview as vector PDF">
                   <i class="fa-solid fa-file-pdf text-rose-500 hover:text-white"></i> PDF Report
                 </button>
 
-                <button onclick="resetSpecificMonth(${year}, ${month})" class="px-2.5 py-1 text-xs font-medium rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 transition flex items-center gap-1.5" title="Reset this month to default">
+                ${isAdmin ? `<button onclick="resetSpecificMonth(${year}, ${month})" class="px-2.5 py-1 text-xs font-medium rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 transition flex items-center gap-1.5" title="Reset this month to default">
                   <i class="fa-solid fa-rotate-left text-slate-400"></i> Reset Month
-                </button>
+                </button>` : ''}
               </div>
             </div>
 
@@ -1095,13 +1156,13 @@
           const colBg = (isSun || isSat) ? 'bg-sky-50 text-sky-800 font-bold' : 'bg-slate-50 text-slate-700';
 
           containerHtml += `
-            <th class="py-2 px-1 text-center border-r border-b border-slate-200 min-w-[34px] cursor-pointer hover:bg-indigo-50 hover:text-indigo-800 transition group ${colBg}"
-                onclick="handleDayHeaderClick(${year}, ${month}, ${d})"
-                title="Click to update all employees on ${monthNames[month]} ${d}">
+            <th class="py-2 px-1 text-center border-r border-b border-slate-200 min-w-[34px] transition group ${colBg} ${isAdmin ? 'cursor-pointer hover:bg-indigo-50 hover:text-indigo-800' : 'cursor-default'}"
+                ${isAdmin ? `onclick="handleDayHeaderClick(${year}, ${month}, ${d})"` : ''}
+                title="${isAdmin ? `Click to update all employees on ${monthNames[month]} ${d}` : ''}">
               <div class="text-[10px] uppercase font-semibold group-hover:text-indigo-600">${dayNames[dayOfWeek]}</div>
               <div class="text-xs font-bold flex items-center justify-center gap-0.5">
                 <span>${d}</span>
-                <i class="fa-solid fa-pen text-[8px] opacity-0 group-hover:opacity-100 text-indigo-500 transition-opacity"></i>
+                ${isAdmin ? `<i class="fa-solid fa-pen text-[8px] opacity-0 group-hover:opacity-100 text-indigo-500 transition-opacity"></i>` : ''}
               </div>
             </th>`;
         }
@@ -1162,8 +1223,8 @@
             }
 
             containerHtml += `
-              <td class="p-1 text-center border-r border-b border-slate-100 cursor-pointer" onclick="handleCellClick('${emp}', ${year}, ${month}, ${d})">
-                <div class="h-6 w-6 sm:h-7 sm:w-7 mx-auto rounded-md flex items-center justify-center text-[10px] transition-all transform active:scale-90 ${badgeClass}" title="${emp} - ${monthTitle} Day ${d} (${isSat ? 'Saturday' : isSun ? 'Sunday' : 'Weekday'}): ${status ? STATUS_MAP[status].name + ' (Click to change)' : 'Cleared'}">
+              <td class="p-1 text-center border-r border-b border-slate-100 ${isAdmin ? 'cursor-pointer' : ''}" ${isAdmin ? `onclick="handleCellClick('${emp}', ${year}, ${month}, ${d})"` : ''}>
+                <div class="h-6 w-6 sm:h-7 sm:w-7 mx-auto rounded-md flex items-center justify-center text-[10px] transition-all transform ${isAdmin ? 'active:scale-90' : ''} ${badgeClass}" title="${emp} - ${monthTitle} Day ${d} (${isSat ? 'Saturday' : isSun ? 'Sunday' : 'Weekday'}): ${status ? STATUS_MAP[status].name + (isAdmin ? ' (Click to change)' : '') : 'Cleared'}">
                   ${badgeContent}
                 </div>
               </td>`;
@@ -1262,6 +1323,7 @@
     }
 
     function handleDayHeaderClick(year, month, day) {
+      if (!isAdmin) return;
       activeDayColumnTarget = { year, month, day };
       const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
       const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -1280,7 +1342,7 @@
     }
 
     function setDayColumnStatus(status) {
-      if (!activeDayColumnTarget) return;
+      if (!isAdmin || !activeDayColumnTarget) return;
       const { year, month, day } = activeDayColumnTarget;
       const monthKey = getMonthKey(year, month);
       const dow = new Date(year, month, day).getDay();
@@ -1313,6 +1375,7 @@
     }
 
     function handleCellClick(emp, year, month, day) {
+      if (!isAdmin) return;
       const currentStatus = getEffectiveStatus(year, month, day, emp);
       activeCellTarget = { emp, year, month, day };
 
@@ -1328,7 +1391,7 @@
     }
 
     function setCellStatus(status) {
-      if (!activeCellTarget) return;
+      if (!isAdmin || !activeCellTarget) return;
       const { emp, year, month, day } = activeCellTarget;
       const monthKey = getMonthKey(year, month);
       const dow = new Date(year, month, day).getDay();
@@ -1359,6 +1422,7 @@
     }
 
     function resetSpecificMonth(year, month) {
+      if (!isAdmin) return;
       const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
       const key = getMonthKey(year, month);
       delete attendanceData[key];
@@ -1412,7 +1476,7 @@
         if (annualView && !annualView.classList.contains('hidden')) {
           annualView.classList.add('hidden');
           monthlyView.classList.remove('hidden');
-          tabAnnualBtn.className = "px-3 py-1 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition";
+          tabAnnualBtn.className = "px-3 py-1 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition flex items-center gap-1.5";
         }
         const currentMKey = `${realTodayYear}-${realTodayMonth}`;
         const targetSection = document.getElementById(`month-section-${currentMKey}`);
@@ -1429,12 +1493,12 @@
         if (isAnnualOpen) {
           annualView.classList.add('hidden');
           monthlyView.classList.remove('hidden');
-          tabAnnualBtn.className = "px-3 py-1 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition";
+          tabAnnualBtn.className = "px-3 py-1 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition flex items-center gap-1.5";
         } else {
           annualView.classList.remove('hidden');
           monthlyView.classList.add('hidden');
           renderAnnualOverview();
-          tabAnnualBtn.className = "px-3 py-1 text-xs font-semibold rounded-lg bg-indigo-600 text-white shadow-xs transition";
+          tabAnnualBtn.className = "px-3 py-1 text-xs font-semibold rounded-lg bg-indigo-600 text-white shadow-xs transition flex items-center gap-1.5";
         }
       });
 
