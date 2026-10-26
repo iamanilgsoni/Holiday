@@ -817,6 +817,11 @@
 
     // --- PURE VECTOR PDF GENERATOR: MONTHLY GRID + ANNUAL OVERVIEW WITH DD-MM-YYYY DOJ ---
     function generateMonthPDF(year, month) {
+      if (!isAdmin) {
+        showToast("Only admins can generate PDF reports.");
+        return;
+      }
+
       const { jsPDF } = window.jspdf;
       const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
       const dayNames = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
@@ -1169,9 +1174,11 @@
                   <i class="fa-solid fa-arrow-pointer mr-1 text-indigo-400"></i>Click date to update all
                 </span>` : ''}
 
+                ${isAdmin ? `
                 <button onclick="generateMonthPDF(${year}, ${month})" class="px-2.5 py-1 text-xs font-semibold rounded-lg text-rose-700 hover:text-white bg-rose-50 hover:bg-rose-600 border border-rose-200 hover:border-rose-600 transition flex items-center gap-1.5 shadow-2xs" title="Export ${monthTitle} attendance and annual overview as vector PDF">
                   <i class="fa-solid fa-file-pdf text-rose-500 hover:text-white"></i> PDF Report
                 </button>
+                ` : ''}
 
                 ${isAdmin ? `<button onclick="resetSpecificMonth(${year}, ${month})" class="px-2.5 py-1 text-xs font-medium rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 transition flex items-center gap-1.5" title="Reset this month to default">
                   <i class="fa-solid fa-rotate-left text-slate-400"></i> Reset Month
