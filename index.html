@@ -201,7 +201,9 @@
     </div>
 
     <!-- Annual Overview View with Date of Joining (DOJ) -->
-    <div id="annualView" class="hidden space-y-4">
+    <div id="annualView" class="hidden space-y-4 sm:space-y-6">
+      
+      <!-- Existing Annual Leaves Summary Box -->
       <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-md">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <div>
@@ -240,6 +242,27 @@
           </table>
         </div>
       </div>
+
+      <!-- NEW: Detailed Leave Records Box -->
+      <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-md">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+          <div>
+            <h2 class="text-sm sm:text-base font-bold text-slate-900">Detailed Leave Records:</h2>
+            <p class="text-[10px] sm:text-xs text-slate-500 mt-1">Review specific dates for holidays and leaves taken by an employee in this cycle.</p>
+          </div>
+          <div>
+            <select id="empLeaveFilter" onchange="handleEmpLeaveFilterChange()" class="bg-indigo-50 border border-indigo-200 text-indigo-900 font-bold text-xs sm:text-sm rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none cursor-pointer min-w-[160px]">
+              <option value="">Select Employee...</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="empLeaveDetailsContainer" class="bg-slate-50 rounded-xl border border-slate-200 p-4 max-h-[400px] overflow-y-auto">
+          <!-- Populated by JS -->
+          <div class="text-center text-slate-400 text-xs italic py-4">Select an employee to view their leave dates.</div>
+        </div>
+      </div>
+      
     </div>
 
   </main>
@@ -470,7 +493,7 @@
     let employeeRoster = [];
 
     const STATUS_MAP = {
-      'WO':  { label: 'WO',  name: 'Week Off',            bg: 'bg-sky-100 text-sky-800 font-bold border border-sky-300' },
+      'WO':  { label: 'WO',  name: 'Week Off',          bg: 'bg-sky-100 text-sky-800 font-bold border border-sky-300' },
       'P':   { label: 'P',   name: 'Present',             bg: 'bg-emerald-500 text-white font-bold shadow-sm' },
       'BH':  { label: 'BH',  name: 'Bank Holiday',        bg: 'bg-purple-600 text-white font-bold shadow-sm' },
       'H':   { label: 'H',   name: 'Holiday',             bg: 'bg-rose-500 text-white font-bold shadow-sm' },
@@ -1412,6 +1435,103 @@
       });
 
       tbody.innerHTML = html;
+      initEmpLeaveFilter();
+      handleEmpLeaveFilterChange();
+    }
+
+    function initEmpLeaveFilter() {
+      const filter = document.getElementById('empLeaveFilter');
+      if (!filter) return;
+      const currentVal = filter.value;
+      
+      // Populate dropdown with active employees
+      filter.innerHTML = '<option value="">Select Employee...</option>';
+      employeeRoster.forEach(emp => {
+        const opt = document.createElement('option');
+        opt.value = emp.name;
+        opt.textContent = emp.name;
+        filter.appendChild(opt);
+      });
+      
+      // Preserve selection or default to "Select Employee..."
+      if (currentVal && employeeRoster.some(e => e.name === currentVal)) {
+        filter.value = currentVal;
+      } else {
+        filter.value = "";
+      }
+    }
+
+    function handleEmpLeaveFilterChange() {
+      const empName = document.getElementById('empLeaveFilter').value;
+      renderEmpLeaveDetails(empName);
+    }
+
+    function renderEmpLeaveDetails(empName) {
+      const container = document.getElementById('empLeaveDetailsContainer');
+      if (!container) return;
+      
+      if (!empName) {
+        container.innerHTML = '<div class="text-center text-slate-400 text-xs italic py-4">Select an employee to view their leave dates.</div>';
+        return;
+      }
+
+      const cycleMonths = getAnnualCycleMonths(selectedCycleStartYear);
+      let leaves = [];
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+      // Scan through all days in the current cycle for the specific employee
+      cycleMonths.forEach(({ year, month }) => {
+        const daysInM = getDaysInMonth(year, month);
+        for (let d = 1; d <= daysInM; d++) {
+          const st = getEffectiveStatus(year, month, d, empName);
+          
+          // Only track actual leaves taken
+          if (['H', 'LWP', 'FH', 'SH'].includes(st)) {
+            const dObj = new Date(year, month, d);
+            leaves.push({
+              dateStr: `${d} ${monthNames[month]} ${year}`,
+              dayName: dayNames[dObj.getDay()],
+              status: st
+            });
+          }
+        }
+      });
+
+      if (leaves.length === 0) {
+        container.innerHTML = `
+          <div class="text-center text-emerald-600 text-xs font-bold py-8 bg-emerald-50 rounded-xl border border-emerald-100">
+            <i class="fa-solid fa-circle-check text-2xl mb-2 block text-emerald-400"></i>
+            No holidays or leaves recorded for ${empName} in this cycle!
+          </div>`;
+        return;
+      }
+
+      // Generate the grid UI
+      let html = '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">';
+      leaves.forEach(lv => {
+        let badgeClass = '';
+        let statusName = '';
+        
+        if (lv.status === 'H') { badgeClass = 'bg-rose-100 text-rose-700 border-rose-200'; statusName = 'Holiday'; }
+        else if (lv.status === 'LWP') { badgeClass = 'bg-red-100 text-red-700 border-red-200'; statusName = 'LWP'; }
+        else if (lv.status === 'FH') { badgeClass = 'bg-amber-100 text-amber-700 border-amber-200'; statusName = '1st Half'; }
+        else if (lv.status === 'SH') { badgeClass = 'bg-orange-100 text-orange-700 border-orange-200'; statusName = '2nd Half'; }
+
+        html += `
+          <div class="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-lg shadow-sm hover:border-indigo-300 transition-colors">
+            <div>
+              <div class="font-bold text-slate-800 text-xs sm:text-sm">${lv.dateStr}</div>
+              <div class="text-[10px] sm:text-xs text-slate-500 font-medium">${lv.dayName}</div>
+            </div>
+            <div class="px-2 py-1 rounded-md border text-[10px] font-bold shadow-sm ${badgeClass}">
+              ${statusName}
+            </div>
+          </div>
+        `;
+      });
+      html += '</div>';
+      container.innerHTML = html;
     }
 
     function handleDayHeaderClick(year, month, day) {
