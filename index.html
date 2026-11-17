@@ -1380,8 +1380,8 @@
       const tbody = document.getElementById('annualSummaryBody');
       if (!tbody) return;
 
-      let html = '';
-      employeeRoster.forEach(empObj => {
+      // STEP 1: Process all employees first to calculate their leave data
+      const processedEmployees = employeeRoster.map(empObj => {
         const emp = empObj.name;
         let totalWO = 0;
         let totalBH = 0;
@@ -1407,29 +1407,49 @@
         // NEW RULE: LWP is not deducted from allotted leaves
         const paidLeavesTaken = totalHoliday + (totalHalf * 0.5);
         const remaining = allotted - paidLeavesTaken;
+
+        return {
+          emp,
+          doj: empObj.doj,
+          allotted, totalWO, totalBH, totalHoliday, totalLWP, totalHalf,
+          totalHolidaysAndLeaves, remaining
+        };
+      });
+
+      // STEP 2: Find the Maximum Remaining Leaves (Must be greater than 0 to get a crown)
+      const maxRemaining = processedEmployees.length > 0 
+        ? Math.max(...processedEmployees.map(e => e.remaining)) 
+        : -Infinity;
+
+      // STEP 3: Generate the HTML Table
+      let html = '';
+      processedEmployees.forEach(data => {
+        const remainingClass = data.remaining < 0 ? 'text-red-600 bg-red-50' : 'text-emerald-700 bg-emerald-50';
         
-        const remainingClass = remaining < 0 ? 'text-red-600 bg-red-50' : 'text-emerald-700 bg-emerald-50';
+        // Determine if this employee gets the crown icon
+        const getsCrown = (data.remaining === maxRemaining) && (maxRemaining > 0);
+        const crownHtml = getsCrown ? `<i class="fa-solid fa-crown text-amber-500 ml-1.5 text-[14px] drop-shadow-sm" title="Highest Remaining Leaves"></i>` : '';
 
         html += `
           <tr class="hover:bg-slate-50 transition border-b border-slate-100 group">
             <td class="py-3 px-3 sm:px-4 font-bold text-slate-800 flex items-center gap-2 sticky left-0 bg-white group-hover:bg-slate-50 z-10 border-r border-slate-200 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">
-              <span class="w-6 h-6 rounded-full bg-purple-100 text-purple-700 inline-flex items-center justify-center font-bold text-[10px] sm:text-xs shrink-0">${emp.charAt(0)}</span>
-              <span class="truncate">${emp}</span>
+              <span class="w-6 h-6 rounded-full bg-purple-100 text-purple-700 inline-flex items-center justify-center font-bold text-[10px] sm:text-xs shrink-0">${data.emp.charAt(0)}</span>
+              <span class="truncate">${data.emp}</span>${crownHtml}
             </td>
             <td class="py-3 px-2 sm:px-3 text-center bg-indigo-50/30">
-              ${formatDisplayDate(empObj.doj)}
+              ${formatDisplayDate(data.doj)}
             </td>
-            <td class="py-3 px-2 sm:px-3 text-center font-bold text-teal-700 bg-teal-50/30 border-r border-slate-100">${allotted}</td>
-            <td class="py-3 px-2 sm:px-3 text-center font-bold text-sky-700 bg-sky-50/50">${totalWO}</td>
-            <td class="py-3 px-2 sm:px-3 text-center font-bold text-purple-700 bg-purple-50/50">${totalBH}</td>
-            <td class="py-3 px-2 sm:px-3 text-center font-semibold text-rose-600">${totalHoliday}</td>
-            <td class="py-3 px-2 sm:px-3 text-center font-semibold text-red-600">${totalLWP}</td>
-            <td class="py-3 px-2 sm:px-3 text-center font-semibold text-amber-600">${totalHalf}</td>
+            <td class="py-3 px-2 sm:px-3 text-center font-bold text-teal-700 bg-teal-50/30 border-r border-slate-100">${data.allotted}</td>
+            <td class="py-3 px-2 sm:px-3 text-center font-bold text-sky-700 bg-sky-50/50">${data.totalWO}</td>
+            <td class="py-3 px-2 sm:px-3 text-center font-bold text-purple-700 bg-purple-50/50">${data.totalBH}</td>
+            <td class="py-3 px-2 sm:px-3 text-center font-semibold text-rose-600">${data.totalHoliday}</td>
+            <td class="py-3 px-2 sm:px-3 text-center font-semibold text-red-600">${data.totalLWP}</td>
+            <td class="py-3 px-2 sm:px-3 text-center font-semibold text-amber-600">${data.totalHalf}</td>
             <td class="py-3 px-2 sm:px-3 text-center font-extrabold text-rose-900 bg-rose-100 border-l border-slate-200 text-xs sm:text-sm">
-              ${totalHolidaysAndLeaves}
+              ${data.totalHolidaysAndLeaves}
             </td>
             <td class="py-3 px-2 sm:px-3 text-center font-extrabold ${remainingClass} text-xs sm:text-sm" title="Allotted Leaves - (Holiday + Half * 0.5)">
-              ${remaining}
+              ${data.remaining}
             </td>
           </tr>`;
       });
